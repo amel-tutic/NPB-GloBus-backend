@@ -1,7 +1,7 @@
-﻿using GloBus_backend.Models;
+﻿using GloBus.Data.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace GloBus_backend.Infrastructure
+namespace GloBus.Data
 {
     public class GloBusContext : DbContext
     {

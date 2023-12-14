@@ -1,4 +1,4 @@
-using GloBus_backend.Infrastructure;
+using GloBus.Data;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

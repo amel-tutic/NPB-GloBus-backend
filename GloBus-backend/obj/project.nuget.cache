@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "I8I/hOB68P8Ocwmk4Beh5f7FDkVykEGxR6nv2HlOzJLjyBppHTr24U62ISH8DHGH9FxQsY6o6LE+X7dcA2Cmqg==",
+  "dgSpecHash": "f3Zi6qlZxMYAuU3w1i4yQF6G8rsYmRj3JZ4YRShv/7uF3/vBuIRqeaXxyhNEIHFXMVP/zKBUSaF9QtuBjrtjJw==",
   "success": true,
-  "projectFilePath": "C:\\Users\\vindo\\Desktop\\gb\\globus-backend\\GloBus-backend\\GloBus-backend\\GloBus-backend.csproj",
+  "projectFilePath": "C:\\Users\\vindo\\Desktop\\gb\\globus-backend\\GloBus-backend\\GloBus-backend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\vindo\\.nuget\\packages\\azure.core\\1.25.0\\azure.core.1.25.0.nupkg.sha512",
     "C:\\Users\\vindo\\.nuget\\packages\\azure.identity\\1.7.0\\azure.identity.1.7.0.nupkg.sha512",
