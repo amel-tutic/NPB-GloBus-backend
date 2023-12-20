@@ -1,4 +1,7 @@
 using GloBus.Data;
+using GloBus.Infrastructure;
+using GloBus.Infrastructure.Interfaces;
+using GloBus.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
