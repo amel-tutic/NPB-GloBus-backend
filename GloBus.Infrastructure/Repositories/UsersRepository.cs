@@ -29,6 +29,7 @@ namespace GloBus.Infrastructure.Repositories
 
         public async Task<User> AddUser(UserDTO userDTO)
         {
+            
             User user = mapper.Map<User>(userDTO);
 
             bool userExists = await context.Users.AnyAsync(u => u.Email == user.Email);

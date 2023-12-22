@@ -3,6 +3,7 @@ using GloBus.Data.Models;
 using GloBus.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 
 namespace GloBus_backend.Controllers
@@ -12,15 +13,20 @@ namespace GloBus_backend.Controllers
     public class UsersController : ControllerBase
     {
         private readonly IUnitOfWork unitOfWork;
+        
 
         public UsersController(IUnitOfWork UnitOfWork)
         {
             unitOfWork = UnitOfWork;
+           
         }
 
         [HttpPost("add")]
         public async Task<IActionResult> Add(UserDTO request)
         {
+            Console.WriteLine(request.FirstName);
+            
+
             User user = await unitOfWork.UsersRepository.AddUser(request);
 
             return Ok(user);

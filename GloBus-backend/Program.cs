@@ -18,6 +18,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: MyAllowSpecificOrigins,
+        policy =>
+        {
+            //.WithOrigins("http://localhost:5093")
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+        });
+});
+
 builder.Services.AddLogging(config =>
 {
     config.AddConsole();
@@ -46,6 +59,9 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthorization();
 
+app.UseCors(MyAllowSpecificOrigins);
+
 app.MapControllers();
 
 app.Run();
+
