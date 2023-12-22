@@ -3,6 +3,7 @@ using GloBus.Data.Models;
 using GloBus.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace GloBus_backend.Controllers
 {
@@ -24,5 +25,24 @@ namespace GloBus_backend.Controllers
 
             return Ok(user);
         }
+
+        [HttpPost("getAll")]
+
+        public async Task<IActionResult> getAll()
+        {
+            try
+            {
+                List<User> users = await unitOfWork.UsersRepository.getAllUsers();
+                return Ok(users); // Vraća 200 OK s listom korisnika
+            }
+            catch (Exception ex)
+            {
+                // Ovdje možete dodati logiku za rukovanje greškama
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+           
+        }
+
+
     }
 }
