@@ -11,5 +11,6 @@ namespace GloBus.Infrastructure.Interfaces
     public interface IUsersRepository
     {
         Task<User> AddUser(UserDTO request);
+        Task<List<User>> getAllUsers();
     }
 }
