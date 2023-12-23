@@ -363,3 +363,5 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /.gitignore
+/GloBus.Data/Migrations/20231223133909_init.cs
+/GloBus.Data/Migrations/20231223133909_init.Designer.cs

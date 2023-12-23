@@ -32,7 +32,7 @@ namespace GloBus_backend.Controllers
             return Ok(user);
         }
 
-        [HttpPost("getAll")]
+        [HttpGet("getAll")]
 
         public async Task<IActionResult> getAll()
         {
