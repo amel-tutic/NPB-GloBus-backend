@@ -12,5 +12,6 @@ namespace GloBus.Infrastructure.Interfaces
     {
         Task<User> AddUser(UserDTO request);
         Task<List<User>> getAllUsers();
+        
     }
 }

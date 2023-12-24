@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BCrypt.Net;
 
 namespace GloBus.Infrastructure.Repositories
 {
@@ -40,6 +41,10 @@ namespace GloBus.Infrastructure.Repositories
             }
             else
             {
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
+
+                user.Password = hashedPassword;
+
                 await context.Users.AddAsync(user);
 
                 await context.SaveChangesAsync();
@@ -61,6 +66,7 @@ namespace GloBus.Infrastructure.Repositories
             } 
 
         }
+
 
         public async Task<List<User>> getAllUsers()
         {
