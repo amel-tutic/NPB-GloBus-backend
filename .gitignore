@@ -365,4 +365,4 @@ FodyWeavers.xsd
 /.gitignore
 /GloBus.Data/Migrations/20231223133909_init.cs
 /GloBus.Data/Migrations/20231223133909_init.Designer.cs
-/GloBus-backend/GloBus-backend.csproj
+
