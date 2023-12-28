@@ -3,7 +3,10 @@ using GloBus.Infrastructure;
 using GloBus.Infrastructure.CustomMiddlewares;
 using GloBus.Infrastructure.Interfaces;
 using GloBus.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +59,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
