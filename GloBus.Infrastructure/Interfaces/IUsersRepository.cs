@@ -10,8 +10,9 @@ namespace GloBus.Infrastructure.Interfaces
 {
     public interface IUsersRepository
     {
-        Task<User> AddUser(UserDTO request);
+        Task<User> AddUser(UserRegisterDTO request);
         Task<List<User>> getAllUsers();
+        Task<ApiResponse<User>> loginUser(UserLoginDTO request);
         
     }
 }

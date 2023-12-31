@@ -12,6 +12,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BCrypt.Net;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Azure;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace GloBus.Infrastructure.Repositories
 {
@@ -28,10 +33,36 @@ namespace GloBus.Infrastructure.Repositories
             this.logger = logger;
         }
 
-        public async Task<User> AddUser(UserDTO userDTO)
+        //jwt generate
+        private string GenerateJwtToken(User user)
+        {
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Name, user.FirstName),
+    };
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("INEDODJETUPONOVONIKADAVISEKAOZIVCOVEK"));
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+            var expires = DateTime.Now.AddHours(8);
+
+            var token = new JwtSecurityToken(
+                issuer: "https://globus.rs",
+                audience: "https://globus.rs",
+                claims: claims,
+                expires: expires,
+                signingCredentials: credentials
+            );
+
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        //add user
+        public async Task<User> AddUser(UserRegisterDTO userRegisterDTO)
         {
             
-            User user = mapper.Map<User>(userDTO);
+            User user = mapper.Map<User>(userRegisterDTO);
 
             bool userExists = await context.Users.AnyAsync(u => u.Email == user.Email);
            
@@ -41,7 +72,7 @@ namespace GloBus.Infrastructure.Repositories
             }
             else
             {
-                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userDTO.Password);
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(userRegisterDTO.Password);
 
                 user.Password = hashedPassword;
 
@@ -50,7 +81,7 @@ namespace GloBus.Infrastructure.Repositories
                 await context.SaveChangesAsync();
 
                 user = await context.Users
-                    .Where(u => u.Email == userDTO.Email)
+                    .Where(u => u.Email == userRegisterDTO.Email)
                     .FirstOrDefaultAsync();
                 if(user == null)
                 {
@@ -67,11 +98,47 @@ namespace GloBus.Infrastructure.Repositories
 
         }
 
-
+        //getAll
         public async Task<List<User>> getAllUsers()
         {
             List<User> users = await context.Users.ToListAsync();
             return users;
-        }  
+        }
+
+        //login
+        public async Task<ApiResponse<User>> loginUser(UserLoginDTO userLoginDTO)
+        {
+            User user = mapper.Map<User>(userLoginDTO);
+
+            user = await context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+
+            if(user == null)
+            {
+                throw new LoginFailedException("Invalid credentials.");
+            }
+
+            bool passwordMatch = BCrypt.Net.BCrypt.Verify(userLoginDTO.Password, user.Password);
+
+            if(passwordMatch)
+            {
+                var token = GenerateJwtToken(user);
+
+                var response = new ApiResponse<User>
+                {
+                    Status = true,
+                    Message = "Log in successfull",
+                    Data = user,
+                    Token = token
+                };
+
+                return response;
+            }
+            else
+            {
+                throw new LoginFailedException("Invalid credentials.");
+            }
+
+           /* logger.LogInformation(user.FirstName + " logged in");*/
+        }
     }
 }

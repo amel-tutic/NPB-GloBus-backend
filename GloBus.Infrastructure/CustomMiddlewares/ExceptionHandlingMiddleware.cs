@@ -60,6 +60,10 @@ namespace GloBus.Infrastructure.CustomMiddlewares
                     errorResponse.Message = ex.Message;
                     break;
 
+                case LoginFailedException ex:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse.Message = ex.Message;
+                    break;
 
                 case Exception ex:
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
