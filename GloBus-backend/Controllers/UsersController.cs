@@ -22,9 +22,9 @@ namespace GloBus_backend.Controllers
         }
 
         [HttpPost("add")]
-        public async Task<IActionResult> Add(UserDTO request)
+        public async Task<IActionResult> Add(UserRegisterDTO request)
         {
-            Console.WriteLine(request.FirstName);
+            /*Console.WriteLine(request.FirstName);*/
             
 
             User user = await unitOfWork.UsersRepository.AddUser(request);
@@ -39,14 +39,29 @@ namespace GloBus_backend.Controllers
             try
             {
                 List<User> users = await unitOfWork.UsersRepository.getAllUsers();
-                return Ok(users); // Vraća 200 OK s listom korisnika
+                return Ok(users); 
             }
             catch (Exception ex)
             {
-                // Ovdje možete dodati logiku za rukovanje greškama
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
            
+        }
+
+        [HttpPost("login")]
+        public async Task<IActionResult> login(UserLoginDTO request)
+        {
+            try
+            {
+                var user = await unitOfWork.UsersRepository.loginUser(request);
+
+                return Ok(user);
+            }
+            catch (Exception ex)
+            {
+
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
 
 
