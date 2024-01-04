@@ -50,17 +50,12 @@ namespace GloBus.Infrastructure.CustomMiddlewares
             {
                
 
-                case ApplicationException ex:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    errorResponse.Message = ex.Message;
-                    break;
-
-                case UserExistsException ex:
-                    response.StatusCode = (int)HttpStatusCode.BadRequest;
-                    errorResponse.Message = ex.Message;
-                    break;
-
+                
                 case LoginFailedException ex:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse.Message = ex.Message;
+                    break;
+                case UserExistsException ex:
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     errorResponse.Message = ex.Message;
                     break;
@@ -71,7 +66,6 @@ namespace GloBus.Infrastructure.CustomMiddlewares
                     break;
 
                 default:
-
                     response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     errorResponse.Message = "Internal server error!";
                     break;

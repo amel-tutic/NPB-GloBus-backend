@@ -1,6 +1,7 @@
 ﻿using GloBus.Data.DTOs;
 using GloBus.Data.Models;
 using GloBus.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,7 @@ using System.Collections.Generic;
 namespace GloBus_backend.Controllers
 {
     [Route("api/[controller]")]
+    
     [ApiController]
     public class UsersController : ControllerBase
     {
@@ -32,7 +34,7 @@ namespace GloBus_backend.Controllers
             return Ok(user);
         }
 
-        [HttpGet("getAll")]
+        [HttpGet("getAll"),Authorize]
 
         public async Task<IActionResult> getAll()
         {
@@ -43,7 +45,7 @@ namespace GloBus_backend.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500,  ex.Message);
             }
            
         }
@@ -51,17 +53,11 @@ namespace GloBus_backend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> login(UserLoginDTO request)
         {
-            try
-            {
+           
                 var user = await unitOfWork.UsersRepository.loginUser(request);
 
                 return Ok(user);
-            }
-            catch (Exception ex)
-            {
-
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
+            
         }
 
 

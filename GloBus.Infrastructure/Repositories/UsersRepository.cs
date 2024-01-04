@@ -17,6 +17,7 @@ using Azure;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using static System.Net.WebRequestMethods;
 
 namespace GloBus.Infrastructure.Repositories
 {
@@ -34,28 +35,32 @@ namespace GloBus.Infrastructure.Repositories
         }
 
         //jwt generate
-        private string GenerateJwtToken(User user)
+       
+        public string GenerateJwtToken(User user)
         {
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-        new Claim(ClaimTypes.Name, user.FirstName),
-    };
-
+        {
+              
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.FirstName),
+        };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("INEDODJETUPONOVONIKADAVISEKAOZIVCOVEK"));
+
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var expires = DateTime.Now.AddHours(8);
+            var expires = DateTime.Now.AddSeconds(10);
 
             var token = new JwtSecurityToken(
-                issuer: "https://globus.rs",
-                audience: "https://globus.rs",
-                claims: claims,
-                expires: expires,
-                signingCredentials: credentials
+                issuer: "https://localhost:7269", 
+                audience: "https://localhost:7269",
+                claims: claims, 
+                expires: expires, 
+                signingCredentials: credentials 
             );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
+
+            return tokenString;
         }
 
         //add user
@@ -69,6 +74,7 @@ namespace GloBus.Infrastructure.Repositories
             if (userExists)
             {
                 throw new UserExistsException("User already exists");
+                
             }
             else
             {
@@ -85,8 +91,8 @@ namespace GloBus.Infrastructure.Repositories
                     .FirstOrDefaultAsync();
                 if(user == null)
                 {
-                   
-                    throw new UserExistsException("User doesn't exists");
+                    throw new Exception("User doesn't exists");
+                    
                 }
                 else
                 {
@@ -108,37 +114,49 @@ namespace GloBus.Infrastructure.Repositories
         //login
         public async Task<ApiResponse<User>> loginUser(UserLoginDTO userLoginDTO)
         {
-            User user = mapper.Map<User>(userLoginDTO);
+            
+                User user = mapper.Map<User>(userLoginDTO);
 
-            user = await context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
+                user = await context.Users.FirstOrDefaultAsync(u => u.Email == user.Email);
 
-            if(user == null)
-            {
-                throw new LoginFailedException("Invalid credentials.");
-            }
-
-            bool passwordMatch = BCrypt.Net.BCrypt.Verify(userLoginDTO.Password, user.Password);
-
-            if(passwordMatch)
-            {
-                var token = GenerateJwtToken(user);
-
-                var response = new ApiResponse<User>
+                if (user != null)
                 {
-                    Status = true,
-                    Message = "Log in successfull",
-                    Data = user,
-                    Token = token
-                };
+                    bool passwordMatch = BCrypt.Net.BCrypt.Verify(userLoginDTO.Password, user.Password);
 
-                return response;
-            }
-            else
-            {
-                throw new LoginFailedException("Invalid credentials.");
+                    if (passwordMatch)
+                    {
+                        var token = GenerateJwtToken(user);
+
+                        var response = new ApiResponse<User>
+                        {
+                            Status = true,
+                            Message = "Log in successfull",
+                            Data = user,
+                            Token = token
+                        };
+
+                        return response;
+                    }
+                    else
+                    {
+                    throw new LoginFailedException("Invalid credentials");
+                    
+                  
+                    
+                }
+
+                }
+                else
+                {
+                throw new LoginFailedException("Invalid credentials");
+
+
             }
 
-           /* logger.LogInformation(user.FirstName + " logged in");*/
-        }
+
+            /* logger.LogInformation(user.FirstName + " logged in");*/
+
+
+        }  
     }
 }
