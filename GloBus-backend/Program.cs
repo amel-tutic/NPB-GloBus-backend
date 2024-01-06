@@ -1,11 +1,14 @@
 using GloBus.Data;
 using GloBus.Infrastructure;
+using GloBus.Infrastructure;
 using GloBus.Infrastructure.CustomMiddlewares;
 using GloBus.Infrastructure.Interfaces;
 using GloBus.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,7 +33,7 @@ builder.Services.AddCors(options =>
         policy =>
         {
             //.WithOrigins("http://localhost:5093")
-            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
+            policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod().WithExposedHeaders("Authorization");
         });
 });
 
@@ -43,9 +46,10 @@ builder.Services.AddAuthentication(options =>
 {
     options.TokenValidationParameters = new TokenValidationParameters
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
+        ValidateIssuer = false,
+        ValidateAudience = false,
         ValidateLifetime = true,
+        RequireExpirationTime = true,
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration.GetSection("Jwt:Issuer").Value, 
         ValidAudience = builder.Configuration.GetSection("Jwt:Audience").Value, 
@@ -76,15 +80,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
-
 app.UseHttpsRedirection();
 
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-
-app.UseAuthorization();
-app.UseAuthentication();
-
 app.UseCors(MyAllowSpecificOrigins);
+
+
+
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
 
