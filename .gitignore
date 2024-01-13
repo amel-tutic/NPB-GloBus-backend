@@ -384,3 +384,8 @@ FodyWeavers.xsd
 /GloBus.Data/Migrations/20240103152727_identityImplementation.Designer.cs
 /GloBus.Data/Migrations/GloBusContextModelSnapshot.cs
 *.cs
+/GloBus.Data/Migrations/20231222171913_init.cs
+/GloBus.Data/Migrations/20231222171913_init.Designer.cs
+/GloBus.Data/Migrations/20231222171913_init.cs
+/GloBus.Data/Migrations/20231222171913_init.Designer.cs
+/GloBus.Data/Migrations/20231222171913_init.cs
