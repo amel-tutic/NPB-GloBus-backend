@@ -18,6 +18,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using static System.Net.WebRequestMethods;
+using Microsoft.AspNetCore.Http;
 
 namespace GloBus.Infrastructure.Repositories
 {
@@ -43,6 +44,7 @@ namespace GloBus.Infrastructure.Repositories
               
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.FirstName),
+            new Claim(ClaimTypes.Role, user.Role)
         };
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("INEDODJETUPONOVONIKADAVISEKAOZIVCOVEK"));
 
@@ -109,6 +111,57 @@ namespace GloBus.Infrastructure.Repositories
         {
             List<User> users = await context.Users.ToListAsync();
             return users;
+        }
+
+
+        //GetUserById
+        public async Task<User> GetUserById(String token)
+        {
+            try
+            {
+                // Dobijte JWT token iz zaglavlja zahteva
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    throw new TokenNotFound("JWT is not found.");
+                }
+
+                // Dešifrujte JWT token
+                var handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+                if (jsonToken == null)
+                {
+                    throw new TokenNotFound("Failed decoding of the JWT token.");
+                }
+
+                // Dobijte ID korisnika iz Claim-a
+                var userId = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new TokenNotFound("ID was not found.");
+                   
+                }
+
+                // Pretvorite ID korisnika u integer (ili drugi tip koji koristite za ID)
+                if (!int.TryParse(userId, out int id))
+                {
+                    throw new TokenNotFound("Nevalidan format ID korisnika.");
+                }
+                User u =  await context.Users.FindAsync(id);
+
+                return u;
+
+
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Internal server error");
+
+                
+            }
         }
 
         //login

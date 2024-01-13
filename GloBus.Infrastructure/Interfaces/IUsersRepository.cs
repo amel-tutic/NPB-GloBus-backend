@@ -1,5 +1,6 @@
 ﻿using GloBus.Data.DTOs;
 using GloBus.Data.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace GloBus.Infrastructure.Interfaces
         Task<User> AddUser(UserRegisterDTO request);
         Task<List<User>> getAllUsers();
         Task<ApiResponse<User>> loginUser(UserLoginDTO request);
+        Task<User> GetUserById(String token);
         
     }
 }

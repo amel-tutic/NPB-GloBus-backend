@@ -60,6 +60,15 @@ namespace GloBus_backend.Controllers
             
         }
 
+        [HttpGet("getUserById"), Authorize]
+        public async Task<IActionResult> GetUserById()
+        {
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            var user = await unitOfWork.UsersRepository.GetUserById(token);
+            return Ok(user);
+        }
+
 
     }
 }
