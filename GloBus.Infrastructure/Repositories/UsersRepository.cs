@@ -112,6 +112,16 @@ namespace GloBus.Infrastructure.Repositories
             List<User> users = await context.Users.ToListAsync();
             return users;
         }
+        public async Task<List<Line>> getAllLines()
+        {
+            List<Line> line = await context.Line.ToListAsync();
+            return line;
+        }
+        public async Task<List<TicketType>> getTicketTypes()
+        {
+            List<TicketType> types = await context.TicketType.ToListAsync();
+            return types;
+        }
 
 
         //GetUserById
@@ -207,9 +217,73 @@ namespace GloBus.Infrastructure.Repositories
             }
 
 
+
             /* logger.LogInformation(user.FirstName + " logged in");*/
 
 
-        }  
+        }
+        public async Task<Ticket> AddTicket(TicketDTO TicketDto)
+        {
+
+            Ticket ticket = mapper.Map<Ticket>(TicketDto);
+
+
+                await context.Ticket.AddAsync(ticket);
+
+                await context.SaveChangesAsync();
+
+            ticket = await context.Ticket
+                .Where(t => t.UserId == TicketDto.UserId)
+                .FirstOrDefaultAsync();
+            if (ticket == null)
+            {
+                throw new Exception("Ticket doesn't exists");
+
+            }
+            else
+            {
+                logger.LogInformation("Ticket added.");
+                return ticket;
+            }
+
+
+
+        }
+        public async Task<List<Ticket>> getUserTicket(String token)
+        {
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new TokenNotFound("JWT is not found.");
+            }
+
+            // Dešifrujte JWT token
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            if (jsonToken == null)
+            {
+                throw new TokenNotFound("Failed decoding of the JWT token.");
+            }
+
+            // Dobijte ID korisnika iz Claim-a
+            var userId = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new TokenNotFound("ID was not found.");
+
+            }
+
+            // Pretvorite ID korisnika u integer (ili drugi tip koji koristite za ID)
+            if (!int.TryParse(userId, out int id))
+            {
+                throw new TokenNotFound("Nevalidan format ID korisnika.");
+            }
+            List<Ticket> tickets = await context.Ticket
+    .Where(ticket => ticket.UserId == id)
+    .ToListAsync();
+            return tickets;
+        }
+
     }
 }
