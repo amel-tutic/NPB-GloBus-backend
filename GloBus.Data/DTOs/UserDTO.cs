@@ -17,5 +17,8 @@ namespace GloBus.Data.DTOs
         public string City { get; set; }
         public string PhoneNumber { get; set; }
         public string Gender { get; set; }
+        public string Role { get; set; } 
+        public bool IsApproved { get; set; } 
+        public float Credit { get; set; } 
     }
 }

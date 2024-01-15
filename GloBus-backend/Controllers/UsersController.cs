@@ -50,6 +50,38 @@ namespace GloBus_backend.Controllers
            
         }
 
+        [HttpGet("getAllLines"), Authorize]
+
+        public async Task<IActionResult> getAllLines()
+        {
+            try
+            {
+                List<Line> line = await unitOfWork.UsersRepository.getAllLines();
+                return Ok(line);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+        }
+
+        [HttpGet("getTicketTypes"), Authorize]
+
+        public async Task<IActionResult> getTicketTypes()
+        {
+            try
+            {
+                List<TicketType> ticketTypes = await unitOfWork.UsersRepository.getTicketTypes();
+                return Ok(ticketTypes);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+
+        }
+
         [HttpPost("login")]
         public async Task<IActionResult> login(UserLoginDTO request)
         {
@@ -60,6 +92,34 @@ namespace GloBus_backend.Controllers
             
         }
 
+        [HttpGet("getUserById"), Authorize]
+        public async Task<IActionResult> GetUserById()
+        {
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            var user = await unitOfWork.UsersRepository.GetUserById(token);
+            return Ok(user);
+        }
+
+        [HttpPost("addTicket"), Authorize]
+        public async Task<IActionResult> Add(TicketDTO request)
+        {
+            /*Console.WriteLine(request.FirstName);*/
+
+
+            Ticket ticket = await unitOfWork.UsersRepository.AddTicket(request);
+
+            return Ok("Ticket purchased successfully");
+        }
+
+        [HttpGet("getUserTicket"), Authorize]
+        public async Task<IActionResult> getUserTicket()
+        {
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            List<Ticket> tickets = await unitOfWork.UsersRepository.getUserTicket(token);
+            return Ok(tickets);
+        }
 
     }
 }

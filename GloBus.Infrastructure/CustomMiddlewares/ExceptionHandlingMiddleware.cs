@@ -55,6 +55,10 @@ namespace GloBus.Infrastructure.CustomMiddlewares
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     errorResponse.Message = ex.Message;
                     break;
+                case TokenNotFound ex:
+                    response.StatusCode = (int)HttpStatusCode.BadRequest;
+                    errorResponse.Message = ex.Message;
+                    break;
                 case UserExistsException ex:
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     errorResponse.Message = ex.Message;
