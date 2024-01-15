@@ -14,6 +14,8 @@ namespace GloBus_backend.Profiles
             CreateMap<UserRegisterDTO, User>();
             CreateMap<UserLoginDTO, User>();
             CreateMap<User, UserLoginDTO>();
+            CreateMap<Ticket, TicketDTO>();
+            CreateMap<TicketDTO, Ticket>();
         }
     }
 }
