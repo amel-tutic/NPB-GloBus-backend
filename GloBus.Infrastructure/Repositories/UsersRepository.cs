@@ -224,11 +224,13 @@ namespace GloBus.Infrastructure.Repositories
         }
         public async Task<Ticket> AddTicket(TicketDTO TicketDto)
         {
-
+             
             Ticket ticket = mapper.Map<Ticket>(TicketDto);
+            var user = await context.Users.FirstOrDefaultAsync(u => u.Id == ticket.UserId);
+            var ticketType = await context.TicketType.FirstOrDefaultAsync(u => u.id == ticket.TicketType);
+            user.Credit -= ticketType.price;
 
-
-                await context.Ticket.AddAsync(ticket);
+            await context.Ticket.AddAsync(ticket);
 
                 await context.SaveChangesAsync();
 
@@ -284,6 +286,79 @@ namespace GloBus.Infrastructure.Repositories
     .ToListAsync();
             return tickets;
         }
+
+        public async Task<User> AddCredit(string token, AddCreditRequest addCreditRequest)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(token))
+                {
+                    throw new TokenNotFound("JWT is not found.");
+                }
+
+                // Dešifrujte JWT token
+                var handler = new JwtSecurityTokenHandler();
+                var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+                if (jsonToken == null)
+                {
+                    throw new TokenNotFound("Failed decoding of the JWT token.");
+                }
+
+                // Dobijte ID korisnika iz Claim-a
+                var userId = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+                if (string.IsNullOrEmpty(userId))
+                {
+                    throw new TokenNotFound("ID was not found.");
+
+                }
+
+                // Pretvorite ID korisnika u integer (ili drugi tip koji koristite za ID)
+                if (!int.TryParse(userId, out int id))
+                {
+                    throw new TokenNotFound("Nevalidan format ID korisnika.");
+                }
+                // Dobijanje ID-a korisnika iz tokena
+                var user = await context.Users.FirstOrDefaultAsync(u => u.Id == id);
+
+                if (user == null)
+                {
+                    throw new UserExistsException("User not found");
+
+                  
+                }
+                else
+                {
+                    user.Credit += addCreditRequest.AddCreditValue;
+                    await context.SaveChangesAsync();
+                    return user;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Internal Server Error");
+            }
+        }
+        public async Task<Boolean> CheckTicket(int id)
+        {
+            try
+            {
+                // Dobijte JWT token iz zaglavlja zahteva
+
+                Ticket t = await context.Ticket.FindAsync(id);
+                DateTime now = DateTime.Now;
+                return t.ToDate > now;
+
+
+
+            } catch (Exception ex)
+            {
+                throw new Exception("Internal server error");
+
+
+    }
+}
 
     }
 }

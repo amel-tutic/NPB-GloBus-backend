@@ -121,5 +121,28 @@ namespace GloBus_backend.Controllers
             return Ok(tickets);
         }
 
+        [HttpPost("addCredit"), Authorize]
+        public async Task<IActionResult> Add(AddCreditRequest addCreditRequest)
+        {
+            
+            
+            /*Console.WriteLine(request.FirstName);*/
+            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+
+            User user = await unitOfWork.UsersRepository.AddCredit(token, addCreditRequest);
+
+            return Ok(user);
+        }
+
+        [HttpPost("CheckTicket"), Authorize]
+        public async Task<IActionResult> CheckTicket(int id)
+        {
+           
+
+            Boolean isValid = await unitOfWork.UsersRepository.CheckTicket(id);
+
+            return Ok(isValid);
+        }
+
     }
 }
