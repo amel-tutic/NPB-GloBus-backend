@@ -20,6 +20,8 @@ namespace GloBus.Infrastructure.Interfaces
         Task<ApiResponse<User>> loginUser(UserLoginDTO request);
         Task<User> GetUserById(String token);
         Task<List<Ticket>> getUserTicket(String token);
+        Task<User> AddCredit(String token, AddCreditRequest AddCreditValue);
+      
 
     }
 }
