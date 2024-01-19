@@ -20,13 +20,8 @@ namespace GloBus.Infrastructure.Interfaces
         Task<ApiResponse<User>> loginUser(UserLoginDTO request);
         Task<User> GetUserById(String token);
         Task<List<Ticket>> getUserTicket(String token);
-        Task<User> GetUserForPenalty(int id);
-        Task<Ticket> CheckTicket(AddCreditDTO AddCreditDTO);
-        Task<User> AddCredit(String token, AddCreditDTO AddCreditDTO);
-        Task<bool> WritePenalty(PenaltyDTO penalty);
-        Task<List<Penalty>> getMyWrittenPenalties(HttpContext httpContext);
-
-
+        Task<User> AddCredit(String token, AddCreditRequest AddCreditValue);
+      
 
     }
 }

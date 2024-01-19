@@ -287,7 +287,7 @@ namespace GloBus.Infrastructure.Repositories
             return tickets;
         }
 
-        public async Task<User> AddCredit(string token, AddCreditDTO AddCreditDTO)
+        public async Task<User> AddCredit(string token, AddCreditRequest addCreditRequest)
         {
             try
             {
@@ -330,7 +330,7 @@ namespace GloBus.Infrastructure.Repositories
                 }
                 else
                 {
-                    user.Credit += AddCreditDTO.Credit;
+                    user.Credit += addCreditRequest.AddCreditValue;
                     await context.SaveChangesAsync();
                     return user;
                 }
@@ -340,119 +340,25 @@ namespace GloBus.Infrastructure.Repositories
                 throw new Exception("Internal Server Error");
             }
         }
-        public async Task<Ticket> CheckTicket(AddCreditDTO AddCreditDTO)
+        public async Task<Boolean> CheckTicket(int id)
         {
-            Console.WriteLine(AddCreditDTO.Credit);
             try
             {
                 // Dobijte JWT token iz zaglavlja zahteva
-               
-                    Ticket t = await context.Ticket
-                .Where(t => t.Id == AddCreditDTO.Credit)
-                .FirstOrDefaultAsync();
+
+                Ticket t = await context.Ticket.FindAsync(id);
                 DateTime now = DateTime.Now;
-                    if (t != null)
-                    {
-                        return (t);
-                    }
-                    else
-                    {
-                        throw new TokenNotFound("Karta nije pronadjena");
-                    };
+                return t.ToDate > now;
+
+
 
             } catch (Exception ex)
-            {
-                throw new Exception("Internal server error,Mirza :"+ AddCreditDTO.Credit);
-
-
-            }
-         }
-        public async Task<User> GetUserForPenalty(int id)
-        {
-            try
-            {
-                
-               
-                User u = await context.Users.FindAsync(id);
-                if(u!=null){
-                    return u;
-                }
-                else
-                {
-                    throw new Exception("User not found");
-                }
-               
-
-
-
-            }
-            catch (Exception ex)
             {
                 throw new Exception("Internal server error");
 
 
-            }
-        }
-
-        public async Task<bool> WritePenalty(PenaltyDTO penalty)
-        {
-            try
-            {
-
-                Penalty p = mapper.Map<Penalty>(penalty);
-
-                await context.Penalty.AddAsync(p);
-
-                await context.SaveChangesAsync();
-                return true;
-            }
-            catch(Exception ex) {
-                Console.WriteLine(ex);
-                return false;
-            }
-
-
-
-
-
-        }
-        public async Task<List<Penalty>> getMyWrittenPenalties(HttpContext httpContext)
-        {
-            var token =  httpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-           
-            if (string.IsNullOrEmpty(token))
-            {
-                throw new TokenNotFound("JWT is not found.");
-            }
-
-            // Dešifrujte JWT token
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-
-            if (jsonToken == null)
-            {
-                throw new TokenNotFound("Failed decoding of the JWT token.");
-            }
-
-            // Dobijte ID korisnika iz Claim-a
-            var userId = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new TokenNotFound("ID was not found.");
-            }
-
-            // Pretvorite ID korisnika u integer (ili drugi tip koji koristite za ID)
-            if (!int.TryParse(userId, out int id))
-            {
-                throw new TokenNotFound("Nevalidan format ID korisnika.");
-            }
-            
-            List<Penalty> penaltyes = await context.Penalty
-    .Where(penalty => penalty.inspectorId == id)
-    .ToListAsync();
-            return penaltyes;
-        }
+    }
+}
 
     }
 }
