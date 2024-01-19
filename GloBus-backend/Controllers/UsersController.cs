@@ -133,16 +133,36 @@ namespace GloBus_backend.Controllers
 
             return Ok(user);
         }
-
         [HttpPost("CheckTicket"), Authorize]
-        public async Task<IActionResult> CheckTicket(int id)
+        public async Task<IActionResult> CheckTicket(AddCreditDTO AddCreditDTO)
+        
+            {
+
+
+
+                Ticket t = await unitOfWork.UsersRepository.CheckTicket(AddCreditDTO);
+                User u = await unitOfWork.UsersRepository.GetUserForPenalty(t.UserId);
+                var result = new { ticket = t, user = u };
+                return Ok(result);
+
+            }
+        [HttpPost("WritePenalty"), Authorize]
+
+        public async Task<IActionResult> WritePenalty(PenaltyDTO penalty)
         {
-           
+            bool isWrited = await unitOfWork.UsersRepository.WritePenalty(penalty);
+            return Ok(isWrited);
 
-            Boolean isValid = await unitOfWork.UsersRepository.CheckTicket(id);
-
-            return Ok(isValid);
         }
 
+        [HttpGet("getMyWrittenPenalties"), Authorize]
+        public async Task<IActionResult> getMyWrittenPenalties()
+        {
+            List<Penalty> penalties = await unitOfWork.UsersRepository.getMyWrittenPenalties(HttpContext);
+
+            return Ok(penalties);
+
+        }
     }
 }
+
