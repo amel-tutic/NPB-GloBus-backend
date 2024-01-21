@@ -9,7 +9,7 @@ namespace GloBus.Data.Models
     public class ActiveTickets
     {
         public int id { get; set; }
-        public int Ticket { get; set; }
+        public Ticket Ticket { get; set; }
 
 
     }

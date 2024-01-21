@@ -9,6 +9,6 @@ namespace GloBus.Data.Models
     public class InvalidTickets
     {
         public int id { get; set; }
-        public int Ticket { get; set; }
+        public Ticket Ticket { get; set; }
     }
 }
