@@ -37,6 +37,7 @@ builder.Services.AddCors(options =>
         });
 });
 
+//jwt
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -66,8 +67,15 @@ builder.Services.AddLogging(config =>
 });
 
 //repositories DI
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<ILinesRepository, LinesRepository>();
+builder.Services.AddScoped<ITicketsRepository, TicketsRepository>();
+builder.Services.AddScoped<ITicketTypesRepository, TicketTypesRepository>();
+builder.Services.AddScoped<IActiveTicketsRepository, ActiveTicketsRepository>();
+builder.Services.AddScoped<IInvalidTicketsRepository, InvalidTicketsRepository>();
+builder.Services.AddScoped<IRegionsRepository, RegionsRepository>();
+builder.Services.AddScoped<IPenaltiesRepository, PenaltiesRepository>();
 
 //automapper config
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
@@ -83,9 +91,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors(MyAllowSpecificOrigins);
-
-
-
 
 app.UseAuthentication();
 app.UseAuthorization();
