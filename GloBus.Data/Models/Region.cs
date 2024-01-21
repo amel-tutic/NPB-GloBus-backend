@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace GloBus.Data.Models
 {
-    public class AddCreditRequest
+    public class Region
     {
-        public float AddCreditValue { get; set; }
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<Line> Lines { get; set; }
     }
 }
