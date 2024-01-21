@@ -4,6 +4,8 @@ using GloBus.Infrastructure;
 using GloBus.Infrastructure.CustomMiddlewares;
 using GloBus.Infrastructure.Interfaces;
 using GloBus.Infrastructure.Repositories;
+using GloBus_backend.BackgroundJobs.CheckForInvalidTickets;
+using Hangfire;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -77,8 +79,20 @@ builder.Services.AddScoped<IInvalidTicketsRepository, InvalidTicketsRepository>(
 builder.Services.AddScoped<IRegionsRepository, RegionsRepository>();
 builder.Services.AddScoped<IPenaltiesRepository, PenaltiesRepository>();
 
+//register services for recurring jobs
+builder.Services.AddTransient<ICheckForInvalidTickets, CheckForInvalidTickets>();
+
 //automapper config
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
+//hangfire
+builder.Services.AddHangfire(config =>
+{
+    config.UseSimpleAssemblyNameTypeSerializer();
+    config.UseRecommendedSerializerSettings();
+    config.UseSqlServerStorage(builder.Configuration.GetConnectionString("default"));
+});
+builder.Services.AddHangfireServer();
 
 var app = builder.Build();
 
@@ -98,6 +112,11 @@ app.UseAuthorization();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
+
+app.UseHangfireServer();
+app.UseHangfireDashboard();
+
+RecurringJob.AddOrUpdate<ICheckForInvalidTickets>("checking-for-invalid-tickets", service => service.Check(), Cron.Minutely);
 
 app.Run();
 
