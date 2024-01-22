@@ -112,7 +112,7 @@ namespace GloBus_backend.Controllers
             return Ok("Ticket purchased successfully");
         }
 
-        [HttpGet("getUserTicket"), Authorize]
+        [HttpGet("getUserTickets"), Authorize]
         public async Task<IActionResult> getUserTickets()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
