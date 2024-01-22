@@ -23,5 +23,31 @@ namespace GloBus.Infrastructure.Repositories
             this.mapper = mapper;
             this.logger = logger;
         }
+
+        public async Task<bool> ApproveTicket(int id)
+        {
+            Ticket ticket = await context.Ticket.FindAsync(id);
+
+            if (ticket == null)
+            {
+                return false;
+            }
+            ticket.isApproved = true;
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteTicket(int id)
+        {
+            Ticket ticket = await context.Ticket.FindAsync(id);
+
+            if (ticket == null)
+            {
+                return false;
+            }
+            context.Ticket.Remove(ticket);
+            await context.SaveChangesAsync();
+            return true;
+        }
     }
 }

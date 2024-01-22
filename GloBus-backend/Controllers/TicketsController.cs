@@ -14,5 +14,19 @@ namespace GloBus_backend.Controllers
         {
             unitOfWork = UnitOfWork;
         }
+
+        [HttpPut("approveTicket")]
+        public async Task<IActionResult> approveTicket(int id)
+        {
+            bool isApproved = await unitOfWork.TicketsRepository.ApproveTicket(id);
+            return Ok(isApproved);
+        }
+
+        [HttpDelete("deleteTicket")]
+        public async Task<IActionResult> deleteTicket(int id)
+        {
+            bool isDeleted = await unitOfWork.TicketsRepository.DeleteTicket(id);
+            return Ok(isDeleted);
+        }
     }
 }

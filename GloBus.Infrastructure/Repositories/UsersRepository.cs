@@ -106,12 +106,77 @@ namespace GloBus.Infrastructure.Repositories
 
         }
 
-        //getAll
-        public async Task<List<User>> getAllUsers()
+        //delete user
+        public async Task<bool> DeleteUser(int id)
+        {
+            User user = await context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return false;
+            }
+            context.Users.Remove(user);
+            await context.SaveChangesAsync();
+            return true;
+        }
+            //getAll
+            public async Task<List<User>> getAllUsers()
         {
             List<User> users = await context.Users.ToListAsync();
             return users;
         }
+
+        //approve user
+        public async Task<bool> ApproveUser(int id)
+        {
+            User user = await context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return false;
+            }
+            user.IsApproved = true; 
+            await context.SaveChangesAsync();
+            return true;
+        }
+
+        //add inspector
+        public async Task<User> AddInspector(InspectorDTO inspector)
+        {
+            User user = mapper.Map<User>(inspector);
+
+            bool userExists = await context.Users.AnyAsync(u => u.Email == user.Email);
+
+            if (userExists)
+            {
+                throw new UserExistsException("User already exists");
+
+            }
+            else
+            {
+                string hashedPassword = BCrypt.Net.BCrypt.HashPassword(inspector.Password);
+
+                user.Password = hashedPassword;
+
+                await context.Users.AddAsync(user);
+
+                await context.SaveChangesAsync();
+
+                user = await context.Users
+                    .Where(u => u.Email == inspector.Email)
+                    .FirstOrDefaultAsync();
+                if (user == null)
+                {
+                    throw new Exception("User doesn't exist");
+
+                }
+                else
+                {
+                    logger.LogInformation("User added.");
+                    return user;
+                }
+
+            }
+        }
+
         public async Task<List<Line>> getAllLines()
         {
             List<Line> line = await context.Line.ToListAsync();
