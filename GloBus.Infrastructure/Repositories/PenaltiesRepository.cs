@@ -15,9 +15,9 @@ namespace GloBus.Infrastructure.Repositories
     {
         private readonly GloBusContext context;
         private readonly IMapper mapper;
-        private readonly ILogger<User> logger;
+        private readonly ILogger<Penalty> logger;
 
-        public PenaltiesRepository(GloBusContext context, IMapper mapper, ILogger<User> logger)
+        public PenaltiesRepository(GloBusContext context, IMapper mapper, ILogger<Penalty> logger)
         {
             this.context = context;
             this.mapper = mapper;

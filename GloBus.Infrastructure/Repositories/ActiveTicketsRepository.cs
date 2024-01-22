@@ -15,9 +15,9 @@ namespace GloBus.Infrastructure.Repositories
     {
         private readonly GloBusContext context;
         private readonly IMapper mapper;
-        private readonly ILogger<User> logger;
+        private readonly ILogger<ActiveTickets> logger;
 
-        public ActiveTicketsRepository(GloBusContext context, IMapper mapper, ILogger<User> logger)
+        public ActiveTicketsRepository(GloBusContext context, IMapper mapper, ILogger<ActiveTickets> logger)
         {
             this.context = context;
             this.mapper = mapper;
