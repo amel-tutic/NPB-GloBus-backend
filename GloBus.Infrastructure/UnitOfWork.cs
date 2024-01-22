@@ -15,5 +15,19 @@ namespace GloBus.Infrastructure
         }
 
         public IUsersRepository UsersRepository { get; }
+
+        public ITicketsRepository TicketsRepository { get; }
+
+        public ITicketTypesRepository TicketTypesRepository { get; }
+
+        public ILinesRepository LinesRepository { get; }
+
+        public IActiveTicketsRepository ActiveTicketsRepository { get; }
+
+        public IInvalidTicketsRepository InvalidTicketsRepository { get; }
+
+        public IPenaltiesRepository PenaltiesRepository { get; }
+
+        public IRegionsRepository RegionsRepository { get; }
     }
 }

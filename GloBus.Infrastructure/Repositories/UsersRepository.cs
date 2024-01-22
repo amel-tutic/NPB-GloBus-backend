@@ -50,7 +50,7 @@ namespace GloBus.Infrastructure.Repositories
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            var expires = DateTime.Now.AddSeconds(10);
+            var expires = DateTime.Now.AddMinutes(10);
 
             var token = new JwtSecurityToken(
                 issuer: "https://localhost:7269", 
@@ -287,7 +287,7 @@ namespace GloBus.Infrastructure.Repositories
             return tickets;
         }
 
-        public async Task<User> AddCredit(string token, AddCreditRequest addCreditRequest)
+        public async Task<User> AddCredit(string token, CreditDTO addCreditRequest)
         {
             try
             {
@@ -330,7 +330,7 @@ namespace GloBus.Infrastructure.Repositories
                 }
                 else
                 {
-                    user.Credit += addCreditRequest.AddCreditValue;
+                    user.Credit += addCreditRequest.Credit;
                     await context.SaveChangesAsync();
                     return user;
                 }
@@ -340,7 +340,7 @@ namespace GloBus.Infrastructure.Repositories
                 throw new Exception("Internal Server Error");
             }
         }
-        public async Task<Ticket> CheckTicket(AddCreditDTO AddCreditDTO)
+        public async Task<Ticket> CheckTicket(CreditDTO AddCreditDTO)
         {
             Console.WriteLine(AddCreditDTO.Credit);
             try
@@ -454,7 +454,7 @@ namespace GloBus.Infrastructure.Repositories
             }
 
             List<Penalty> penaltyes = await context.Penalty
-    .Where(penalty => penalty.inspectorId == id)
+    .Where(penalty => penalty.InspectorId == id)
     .ToListAsync();
             return penaltyes;
         }

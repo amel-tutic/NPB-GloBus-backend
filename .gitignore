@@ -362,30 +362,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/.gitignore
-/GloBus.Data/Migrations/20231223133909_init.cs
-/GloBus.Data/Migrations/20231223133909_init.Designer.cs
 
-/GloBus.Data/DTOs/UserRegisterDTO.cs
-/GloBus.Data/DTOs/UserRegisterDTO.cs
-/GloBus.Data/DTOs/UserLoginDTO.cs
 /GloBus-backend/GloBus-backend.csproj
 /GloBus.Infrastructure/GloBus.Infrastructure.csproj
 /GloBus.Data/GloBus.Data.csproj
-/GloBus.Data/Migrations/20231222171913_init.cs
-/GloBus.Data/Migrations/20231222171913_init.Designer.cs
-/GloBus.Infrastructure/GloBus.Infrastructure.csproj
-/GloBus.Data/GloBus.Data.csproj
-/GloBus.Data/DTOs/UserRegisterDTO.cs
-/GloBus.Data/DTOs/UserLoginDTO.cs
-/GloBus.Data/Migrations/20231222171913_init.Designer.cs
-/GloBus.Data/Migrations/20231222171913_init.cs
-/GloBus.Data/Migrations/20240103152727_identityImplementation.cs
-/GloBus.Data/Migrations/20240103152727_identityImplementation.Designer.cs
-/GloBus.Data/Migrations/GloBusContextModelSnapshot.cs
-*.cs
-/GloBus.Data/Migrations/20231222171913_init.cs
-/GloBus.Data/Migrations/20231222171913_init.Designer.cs
-/GloBus.Data/Migrations/20231222171913_init.cs
-/GloBus.Data/Migrations/20231222171913_init.Designer.cs
-/GloBus.Data/Migrations/20231222171913_init.cs
+
+

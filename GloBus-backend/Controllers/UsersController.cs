@@ -112,8 +112,8 @@ namespace GloBus_backend.Controllers
             return Ok("Ticket purchased successfully");
         }
 
-        [HttpGet("getUserTicket"), Authorize]
-        public async Task<IActionResult> getUserTicket()
+        [HttpGet("getUserTickets"), Authorize]
+        public async Task<IActionResult> getUserTickets()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
@@ -122,7 +122,7 @@ namespace GloBus_backend.Controllers
         }
 
         [HttpPost("addCredit"), Authorize]
-        public async Task<IActionResult> Add(AddCreditRequest addCreditRequest)
+        public async Task<IActionResult> Add(CreditDTO addCreditRequest)
         {
             
             
@@ -134,7 +134,7 @@ namespace GloBus_backend.Controllers
             return Ok(user);
         }
         [HttpPost("CheckTicket"), Authorize]
-        public async Task<IActionResult> CheckTicket(AddCreditDTO AddCreditDTO)
+        public async Task<IActionResult> CheckTicket(CreditDTO AddCreditDTO)
         
             {
 

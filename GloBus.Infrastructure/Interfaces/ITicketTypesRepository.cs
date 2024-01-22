@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GloBus.Data.Models
+namespace GloBus.Infrastructure.Interfaces
 {
-    public class AddCreditRequest
+    public interface ITicketTypesRepository
     {
-        public float AddCreditValue { get; set; }
     }
 }

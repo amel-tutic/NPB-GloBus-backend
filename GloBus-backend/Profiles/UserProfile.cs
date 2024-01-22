@@ -10,13 +10,19 @@ namespace GloBus_backend.Profiles
         {
             CreateMap<UserDTO, User>();
             CreateMap<User, UserDTO>();
-            CreateMap<User, AddCreditDTO>() ;
-            CreateMap<AddCreditDTO,User>() ;
+
+            CreateMap<User, CreditDTO>() ;
+            CreateMap<CreditDTO,User>() ;
+
             CreateMap<User, UserRegisterDTO>();
             CreateMap<UserRegisterDTO, User>();
+
             CreateMap<UserLoginDTO, User>();
             CreateMap<User, UserLoginDTO>();
+
             CreateMap<Ticket, TicketDTO>();
+            CreateMap<TicketDTO, Ticket>();
+
             CreateMap<PenaltyDTO, Penalty>();
             CreateMap<Penalty, PenaltyDTO>();
         }

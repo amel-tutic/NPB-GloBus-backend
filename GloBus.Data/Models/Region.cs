@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace GloBus.Data.Models
 {
-    public class ActiveTickets
+    public class Region
     {
-        public int id { get; set; }
-        public Ticket Ticket { get; set; }
-
-
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public List<Line> Lines { get; set; }
     }
 }
