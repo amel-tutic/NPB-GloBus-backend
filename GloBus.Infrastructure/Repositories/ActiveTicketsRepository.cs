@@ -8,6 +8,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GloBus.Infrastructure.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using GloBus.Data.DTOs;
 
 namespace GloBus.Infrastructure.Repositories
 {
@@ -23,5 +25,36 @@ namespace GloBus.Infrastructure.Repositories
             this.mapper = mapper;
             this.logger = logger;
         }
+
+        public async Task<ActiveTickets> Add(TicketIdDTO ticketId)
+        {
+            Ticket t = mapper.Map<Ticket>(ticketId);
+
+            t = await context.Ticket.FindAsync(t.Id);
+
+            if(t == null)
+            {
+                throw new Exception("Ticket doesn't exist!");
+            }
+
+            ActiveTickets activeTicket = new ActiveTickets();
+            activeTicket.Ticket = t;
+
+            await context.ActiveTickets.AddAsync(activeTicket);
+
+            await context.SaveChangesAsync();
+
+            return activeTicket;
+        }
+
+        public async Task<List<ActiveTickets>> GetAll()
+        {
+            List<ActiveTickets> activeTickets = await context.ActiveTickets
+                                                             .Include(at => at.Ticket)
+                                                             .ToListAsync();
+
+            return activeTickets;
+        }
+
     }
 }

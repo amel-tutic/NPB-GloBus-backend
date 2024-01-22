@@ -14,6 +14,9 @@ namespace GloBus_backend.Profiles
             CreateMap<User, CreditDTO>() ;
             CreateMap<CreditDTO,User>() ;
 
+            CreateMap<User, InspectorDTO>();
+            CreateMap<InspectorDTO, User>();
+
             CreateMap<User, UserRegisterDTO>();
             CreateMap<UserRegisterDTO, User>();
 
@@ -25,6 +28,12 @@ namespace GloBus_backend.Profiles
 
             CreateMap<PenaltyDTO, Penalty>();
             CreateMap<Penalty, PenaltyDTO>();
+
+            CreateMap<ActiveTicketDTO, ActiveTickets>();
+            CreateMap<ActiveTickets, ActiveTicketDTO>();
+
+            CreateMap<TicketIdDTO, Ticket>();
+            CreateMap<Ticket, TicketIdDTO>();
         }
     }
 }
