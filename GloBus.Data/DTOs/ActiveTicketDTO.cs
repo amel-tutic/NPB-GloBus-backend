@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GloBus.Infrastructure.Interfaces
+namespace GloBus.Data.DTOs
 {
-    public interface IInvalidTicketsRepository
+    public class ActiveTicketDTO
     {
-        Task<List<InvalidTickets>> GetAll();
+        public Ticket Ticket { get; set; }
     }
 }

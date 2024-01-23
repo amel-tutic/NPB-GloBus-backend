@@ -34,6 +34,28 @@ namespace GloBus_backend.Controllers
             return Ok(user);
         }
 
+        [HttpDelete("delete")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            bool isDeleted = await unitOfWork.UsersRepository.DeleteUser(id);
+            return Ok(isDeleted);
+        }
+
+        [HttpPut("approveUser")]
+        public async Task<IActionResult> approveUser(int id)
+        {
+            bool isApproved = await unitOfWork.UsersRepository.ApproveUser(id);
+            return Ok(isApproved);
+        }
+        
+
+        [HttpPost("addInspector")]
+        public async Task<IActionResult> addInspector(InspectorDTO inspector)
+        {
+            User user = await unitOfWork.UsersRepository.AddInspector(inspector);
+            return Ok(user);
+        }
+
         [HttpGet("getAll"),Authorize]
 
         public async Task<IActionResult> getAll()

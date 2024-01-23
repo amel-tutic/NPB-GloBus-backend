@@ -8,5 +8,7 @@ namespace GloBus.Infrastructure.Interfaces
 {
     public interface ITicketsRepository
     {
+        Task<bool> ApproveTicket(int id);
+        Task<bool> DeleteTicket(int id);
     }
 }

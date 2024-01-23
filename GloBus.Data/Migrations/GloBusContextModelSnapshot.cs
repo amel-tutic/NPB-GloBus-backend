@@ -37,7 +37,7 @@ namespace GloBus.Data.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("ActiveTickets");
+                    b.ToTable("ActiveTickets", (string)null);
                 });
 
             modelBuilder.Entity("GloBus.Data.Models.Admin", b =>
@@ -63,7 +63,7 @@ namespace GloBus.Data.Migrations
 
                     b.HasIndex("RegionId");
 
-                    b.ToTable("Admins");
+                    b.ToTable("Admins", (string)null);
                 });
 
             modelBuilder.Entity("GloBus.Data.Models.InvalidTickets", b =>
@@ -81,7 +81,7 @@ namespace GloBus.Data.Migrations
 
                     b.HasIndex("TicketId");
 
-                    b.ToTable("InvalidTickets");
+                    b.ToTable("InvalidTickets", (string)null);
                 });
 
             modelBuilder.Entity("GloBus.Data.Models.Line", b =>
@@ -111,7 +111,7 @@ namespace GloBus.Data.Migrations
 
                     b.HasIndex("RegionId");
 
-                    b.ToTable("Line");
+                    b.ToTable("Line", (string)null);
                 });
 
             modelBuilder.Entity("GloBus.Data.Models.Penalty", b =>
@@ -136,7 +136,7 @@ namespace GloBus.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Penalty");
+                    b.ToTable("Penalty", (string)null);
                 });
 
             modelBuilder.Entity("GloBus.Data.Models.Region", b =>
@@ -153,7 +153,7 @@ namespace GloBus.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Regions");
+                    b.ToTable("Regions", (string)null);
                 });
 
             modelBuilder.Entity("GloBus.Data.Models.Ticket", b =>
@@ -193,7 +193,7 @@ namespace GloBus.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Ticket");
+                    b.ToTable("Ticket", (string)null);
                 });
 
             modelBuilder.Entity("GloBus.Data.Models.TicketType", b =>
@@ -213,7 +213,7 @@ namespace GloBus.Data.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("TicketType");
+                    b.ToTable("TicketType", (string)null);
                 });
 
             modelBuilder.Entity("GloBus.Data.Models.User", b =>
@@ -271,7 +271,7 @@ namespace GloBus.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("GloBus.Data.Models.ActiveTickets", b =>

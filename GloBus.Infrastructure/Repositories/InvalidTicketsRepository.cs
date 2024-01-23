@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace GloBus.Infrastructure.Repositories
 {
@@ -23,5 +24,13 @@ namespace GloBus.Infrastructure.Repositories
             this.mapper = mapper;
             this.logger = logger;
         }
+
+        public async Task<List<InvalidTickets>> GetAll()
+        {
+            List<InvalidTickets> invalidTickets = await context.InvalidTickets.ToListAsync();
+
+            return invalidTickets;
+        }
+
     }
 }
