@@ -34,6 +34,9 @@ namespace GloBus_backend.Profiles
 
             CreateMap<TicketIdDTO, Ticket>();
             CreateMap<Ticket, TicketIdDTO>();
+
+            CreateMap<AdminDTO, Admin>();
+            CreateMap<Admin, AdminDTO>();
         }
     }
 }
