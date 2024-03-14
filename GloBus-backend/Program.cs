@@ -61,6 +61,36 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
+//swagger auth
+builder.Services.AddSwaggerGen(option =>
+{
+    option.SwaggerDoc("v1", new OpenApiInfo { Title = "GloBus API", Version = "v1" });
+    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+    option.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type=ReferenceType.SecurityScheme,
+                    Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+});
+
+//logging
 builder.Services.AddLogging(config =>
 {
     config.AddConsole();
@@ -77,6 +107,7 @@ builder.Services.AddScoped<IActiveTicketsRepository, ActiveTicketsRepository>();
 builder.Services.AddScoped<IInvalidTicketsRepository, InvalidTicketsRepository>();
 builder.Services.AddScoped<IRegionsRepository, RegionsRepository>();
 builder.Services.AddScoped<IPenaltiesRepository, PenaltiesRepository>();
+builder.Services.AddScoped<IAdminsRepository, AdminsRepository>();
 
 //register services for recurring jobs
 builder.Services.AddTransient<ICheckForInvalidTickets, CheckForInvalidTickets>();

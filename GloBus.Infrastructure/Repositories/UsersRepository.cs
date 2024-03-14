@@ -107,9 +107,9 @@ namespace GloBus.Infrastructure.Repositories
         }
 
         //delete user
-        public async Task<bool> DeleteUser(int id)
+        public async Task<bool> DeleteUser(IdDTO IdDTO)
         {
-            User user = await context.Users.FindAsync(id);
+            User user = await context.Users.FindAsync(IdDTO.Id);
             if (user == null)
             {
                 return false;
@@ -177,11 +177,6 @@ namespace GloBus.Infrastructure.Repositories
             }
         }
 
-        public async Task<List<Line>> getAllLines()
-        {
-            List<Line> line = await context.Line.ToListAsync();
-            return line;
-        }
         public async Task<List<TicketType>> getTicketTypes()
         {
             List<TicketType> types = await context.TicketType.ToListAsync();
@@ -227,8 +222,6 @@ namespace GloBus.Infrastructure.Repositories
                 User u =  await context.Users.FindAsync(id);
 
                 return u;
-
-
 
             }
             catch (Exception ex)
@@ -405,34 +398,33 @@ namespace GloBus.Infrastructure.Repositories
                 throw new Exception("Internal Server Error");
             }
         }
-        public async Task<Ticket> CheckTicket(CreditDTO AddCreditDTO)
+        public async Task<Ticket> CheckTicket(TicketIdDTO ticketId)
         {
-            Console.WriteLine(AddCreditDTO.Credit);
+            /*Console.WriteLine(ticketId.Id);*/
             try
             {
-                // Dobijte JWT token iz zaglavlja zahteva
-
                 Ticket t = await context.Ticket
-            .Where(t => t.Id == AddCreditDTO.Credit)
-            .FirstOrDefaultAsync();
+                    .Where(t => t.Id == ticketId.Id)
+                    .FirstOrDefaultAsync();
+
                 DateTime now = DateTime.Now;
+
                 if (t != null)
                 {
                     return (t);
                 }
                 else
                 {
-                    throw new TokenNotFound("Karta nije pronadjena");
+                    throw new Exception("Ticket not found");
                 };
 
             }
             catch (Exception ex)
             {
-                throw new Exception("Internal server error,Mirza :" + AddCreditDTO.Credit);
-
-
+                throw new Exception("Internal server error: " + ticketId.Id);
             }
         }
+
         public async Task<User> GetUserForPenalty(int id)
         {
             try
@@ -467,7 +459,6 @@ namespace GloBus.Infrastructure.Repositories
         {
             try
             {
-
                 Penalty p = mapper.Map<Penalty>(penalty);
 
                 await context.Penalty.AddAsync(p);
@@ -480,11 +471,6 @@ namespace GloBus.Infrastructure.Repositories
                 Console.WriteLine(ex);
                 return false;
             }
-
-
-
-
-
         }
         public async Task<List<Penalty>> getMyWrittenPenalties(HttpContext httpContext)
         {
@@ -495,7 +481,7 @@ namespace GloBus.Infrastructure.Repositories
                 throw new TokenNotFound("JWT is not found.");
             }
 
-            // Dešifrujte JWT token
+            
             var handler = new JwtSecurityTokenHandler();
             var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
 
@@ -504,7 +490,7 @@ namespace GloBus.Infrastructure.Repositories
                 throw new TokenNotFound("Failed decoding of the JWT token.");
             }
 
-            // Dobijte ID korisnika iz Claim-a
+            
             var userId = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(userId))
@@ -512,17 +498,32 @@ namespace GloBus.Infrastructure.Repositories
                 throw new TokenNotFound("ID was not found.");
             }
 
-            // Pretvorite ID korisnika u integer (ili drugi tip koji koristite za ID)
+            
             if (!int.TryParse(userId, out int id))
             {
                 throw new TokenNotFound("Nevalidan format ID korisnika.");
             }
 
-            List<Penalty> penaltyes = await context.Penalty
-    .Where(penalty => penalty.InspectorId == id)
-    .ToListAsync();
-            return penaltyes;
+            List<Penalty> penalties = await context.Penalty
+                .Where(penalty => penalty.InspectorId == id)
+                .ToListAsync();
+            return penalties;
         }
 
+        public async Task<List<User>> getUnapprovedUsers()
+        {
+            List<User> users = await context.Users
+                .Where(u => u.IsApproved == false && u.Role == "passenger")
+                .ToListAsync();
+            return users;
+        }
+
+        public async Task<List<User>> getAllInspectors()
+        {
+            List<User> inspectors = await context.Users
+                .Where(u => u.Role == "inspector")
+                .ToListAsync();
+            return inspectors;
+        }
     }
 }

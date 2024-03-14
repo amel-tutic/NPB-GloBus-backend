@@ -35,9 +35,9 @@ namespace GloBus_backend.Controllers
         }
 
         [HttpDelete("delete")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(IdDTO IdDTO)
         {
-            bool isDeleted = await unitOfWork.UsersRepository.DeleteUser(id);
+            bool isDeleted = await unitOfWork.UsersRepository.DeleteUser(IdDTO);
             return Ok(isDeleted);
         }
 
@@ -72,21 +72,7 @@ namespace GloBus_backend.Controllers
            
         }
 
-        [HttpGet("getAllLines"), Authorize]
-
-        public async Task<IActionResult> getAllLines()
-        {
-            try
-            {
-                List<Line> line = await unitOfWork.UsersRepository.getAllLines();
-                return Ok(line);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-
-        }
+       
 
         [HttpGet("getTicketTypes"), Authorize]
 
@@ -155,14 +141,11 @@ namespace GloBus_backend.Controllers
 
             return Ok(user);
         }
-        [HttpPost("CheckTicket"), Authorize]
-        public async Task<IActionResult> CheckTicket(CreditDTO AddCreditDTO)
+        [HttpPost("CheckTicket"), Authorize(Roles = "inspector")]
+        public async Task<IActionResult> CheckTicket(TicketIdDTO ticketId)
         
             {
-
-
-
-                Ticket t = await unitOfWork.UsersRepository.CheckTicket(AddCreditDTO);
+                Ticket t = await unitOfWork.UsersRepository.CheckTicket(ticketId);
                 User u = await unitOfWork.UsersRepository.GetUserForPenalty(t.UserId);
                 var result = new { ticket = t, user = u };
                 return Ok(result);
@@ -185,6 +168,21 @@ namespace GloBus_backend.Controllers
             return Ok(penalties);
 
         }
+
+        [HttpGet("getUnapprovedUsers")]
+        public async Task<IActionResult> GetUnapprovedUsers()
+        {
+            List<User> unapprovedUsers = await unitOfWork.UsersRepository.getUnapprovedUsers();
+            return Ok(unapprovedUsers);
+        }
+
+        [HttpGet("getAllInspectors")]
+        public async Task<IActionResult> GetAllInspectors()
+        {
+            List<User> inspectors = await unitOfWork.UsersRepository.getAllInspectors();
+            return Ok(inspectors);
+        }
+
     }
 }
 
