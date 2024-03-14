@@ -17,5 +17,6 @@ namespace GloBus.Infrastructure
         IInvalidTicketsRepository InvalidTicketsRepository { get; }
         IPenaltiesRepository PenaltiesRepository { get; }
         IRegionsRepository RegionsRepository { get; }
+        IAdminsRepository AdminsRepository { get; }
     }
 }

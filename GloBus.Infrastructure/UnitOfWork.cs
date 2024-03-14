@@ -16,7 +16,8 @@ namespace GloBus.Infrastructure
                           IActiveTicketsRepository ActiveTicketsRepository,
                           IInvalidTicketsRepository InvalidTicketsRepository,
                           IPenaltiesRepository PenaltiesRepository,
-                          IRegionsRepository RegionsRepository
+                          IRegionsRepository RegionsRepository,
+                          IAdminsRepository AdminsRepository
                          )
         {
             this.UsersRepository = UsersRepository;
@@ -27,6 +28,7 @@ namespace GloBus.Infrastructure
             this.InvalidTicketsRepository = InvalidTicketsRepository;
             this.PenaltiesRepository = PenaltiesRepository;
             this.RegionsRepository = RegionsRepository;
+            this.AdminsRepository = AdminsRepository;
         }
 
         public IUsersRepository UsersRepository { get; }
@@ -37,5 +39,6 @@ namespace GloBus.Infrastructure
         public IInvalidTicketsRepository InvalidTicketsRepository { get; }
         public IPenaltiesRepository PenaltiesRepository { get; }
         public IRegionsRepository RegionsRepository { get; }
+        public IAdminsRepository AdminsRepository { get; }
     }
 }
