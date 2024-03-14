@@ -1,4 +1,6 @@
 ﻿using GloBus.Data;
+using GloBus.Data.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace GloBus_backend.BackgroundJobs.CheckForInvalidTickets
 {
@@ -15,8 +17,33 @@ namespace GloBus_backend.BackgroundJobs.CheckForInvalidTickets
 
         public void Check()
         {
-            /*Console.WriteLine("The reccuring job fired off! Hooray!");*/
-            logger.LogInformation("The reccuring job fired off! Hooray!");
+            var currentDate = DateTime.Now;
+
+            var invalidTickets = context.ActiveTickets
+                .Include(at => at.Ticket)
+                .Where(at => at.Ticket.ToDate < currentDate)
+                .ToList();
+
+            foreach (var invalidTicket in invalidTickets)
+            {
+                if (invalidTicket.Ticket != null)
+                {
+                    invalidTicket.Ticket.Status = "expired";
+                    context.InvalidTickets.Add(new InvalidTickets
+                    {
+                        Ticket = invalidTicket.Ticket
+                        
+                        //check if it exists already in table
+                    });
+
+                    context.ActiveTickets.Remove(invalidTicket);
+                }
+            }
+
+            context.SaveChanges();
+
+            logger.LogInformation("The recurring job successfully completed!");  
         }
+
     }
 }
