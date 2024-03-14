@@ -11,6 +11,6 @@ namespace GloBus.Data.Models
         public int Id { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public Region Region { get; set; }
+       /* public Region Region { get; set; }*/
     }
 }
