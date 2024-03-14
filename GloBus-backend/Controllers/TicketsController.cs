@@ -1,4 +1,6 @@
-﻿using GloBus.Infrastructure;
+﻿using GloBus.Data.DTOs;
+using GloBus.Data.Models;
+using GloBus.Infrastructure;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,10 +18,17 @@ namespace GloBus_backend.Controllers
         }
 
         [HttpPut("approveTicket")]
-        public async Task<IActionResult> approveTicket(int id)
+        public async Task<IActionResult> approveTicket(TicketIdDTO ticketId)
         {
-            bool isApproved = await unitOfWork.TicketsRepository.ApproveTicket(id);
-            return Ok(isApproved);
+            Ticket approvedTicket = await unitOfWork.TicketsRepository.ApproveTicket(ticketId);
+            return Ok(approvedTicket);
+        }
+
+        [HttpPut("rejectTicket")]
+        public async Task<IActionResult> rejectTicket(TicketIdDTO ticketId)
+        {
+            Ticket rejectedTicket = await unitOfWork.TicketsRepository.RejectTicket(ticketId);
+            return Ok(rejectedTicket);
         }
 
         [HttpDelete("deleteTicket")]
@@ -27,6 +36,22 @@ namespace GloBus_backend.Controllers
         {
             bool isDeleted = await unitOfWork.TicketsRepository.DeleteTicket(id);
             return Ok(isDeleted);
+        }
+
+        [HttpGet("getUnapprovedTickets")]
+        public async Task<IActionResult> GetUnapprovedTickets()
+        {
+            List<Ticket> unapprovedTickets = await unitOfWork.TicketsRepository.getUnapprovedTickets();
+            return Ok(unapprovedTickets);
+        }
+
+        [HttpPost("checkTicketWithScanner")]
+        public async Task<IActionResult> CheckTicketWithScanner([FromQuery] int ticketId)
+        {
+            Ticket t = await unitOfWork.TicketsRepository.checkTicketWithScanner(ticketId);
+            User u = await unitOfWork.UsersRepository.GetUserForPenalty(t.UserId);
+            var result = new { ticket = t, user = u};
+            return Ok(result);
         }
     }
 }
