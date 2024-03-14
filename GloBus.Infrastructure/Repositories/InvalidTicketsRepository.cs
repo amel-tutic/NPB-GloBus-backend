@@ -27,7 +27,9 @@ namespace GloBus.Infrastructure.Repositories
 
         public async Task<List<InvalidTickets>> GetAll()
         {
-            List<InvalidTickets> invalidTickets = await context.InvalidTickets.ToListAsync();
+            List<InvalidTickets> invalidTickets = await context.InvalidTickets
+                .Include(it => it.Ticket)
+                .ToListAsync();
 
             return invalidTickets;
         }
