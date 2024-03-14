@@ -16,6 +16,7 @@ namespace GloBus.Data.Models
         public DateTime FromDate { get; set; }
         public DateTime ToDate { get; set; } 
         public int TicketType { get; set; }
-        public bool isApproved { get; set; } = false; 
+        public bool isApproved { get; set; } = false;
+        public string Status { get; set; } = "pending";
     }
 }
