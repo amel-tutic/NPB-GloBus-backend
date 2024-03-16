@@ -130,17 +130,29 @@ namespace GloBus_backend.Controllers
         }
 
         [HttpPost("addCredit"), Authorize]
-        public async Task<IActionResult> Add(CreditDTO addCreditRequest)
+        public async Task<IActionResult> Add(TransactionRequest transactionRequest)
         {
             
             
             /*Console.WriteLine(request.FirstName);*/
-            var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+           
 
-            User user = await unitOfWork.UsersRepository.AddCredit(token, addCreditRequest);
+            User user = await unitOfWork.UsersRepository.AddCredit(transactionRequest);
 
             return Ok(user);
         }
+
+        [HttpPost("sendTransactionRequest")]
+        public async Task<IActionResult> sendTransactionRequest(TransactionRequestDTO request)
+        {
+            /*Console.WriteLine(request.FirstName);*/
+
+
+            TransactionRequest transactionRequest = await unitOfWork.UsersRepository.sendTransactionRequest(request);
+
+            return Ok(transactionRequest);
+        }
+
         [HttpPost("CheckTicket"), Authorize(Roles = "inspector")]
         public async Task<IActionResult> CheckTicket(TicketIdDTO ticketId)
         
@@ -183,6 +195,12 @@ namespace GloBus_backend.Controllers
             return Ok(inspectors);
         }
 
+        [HttpGet("getAllTransactions")]
+        public async Task<IActionResult> getAllTransactions()
+        {
+            List<TransactionRequest> inspectors = await unitOfWork.UsersRepository.getAllTransactions();
+            return Ok(inspectors);
+        }
     }
 }
 

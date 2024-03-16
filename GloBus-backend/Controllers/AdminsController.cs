@@ -47,5 +47,48 @@ namespace GloBus_backend.Controllers
 
         }
 
+
+        [HttpPut("PromoteToInspector")]
+        public async Task<IActionResult> PromoteToInspector(IdDTO userId)
+        {
+            User promotedUser = await unitOfWork.AdminsRepository.PromoteToInspector(userId);
+            return Ok(promotedUser);
+        }
+
+        [HttpPut("DemoteFromInspector")]
+        public async Task<IActionResult> DemoteFromInspector(IdDTO userId)
+        {
+            User promotedUser = await unitOfWork.AdminsRepository.DemoteFromInspector(userId);
+            return Ok(promotedUser);
+        }
+
+        [HttpDelete("deleteLine")]
+        public async Task<IActionResult> deleteLine(IdDTO IdDTO)
+        {
+            bool isDeleted = await unitOfWork.AdminsRepository.deleteLine(IdDTO);
+            return Ok(isDeleted);
+        }
+
+        [HttpPost("addLine")]
+        public async Task<IActionResult> addLine(LineDTO lineDTO)
+        {
+            Line line = await unitOfWork.AdminsRepository.addLine(lineDTO);
+            return Ok(line);
+        }
+
+        [HttpPut("editLine")]
+        public async Task<IActionResult> editLine(EditLineDTO editLineDTO)
+        {
+            Line editedLine = await unitOfWork.AdminsRepository.editLine(editLineDTO);
+            return Ok(editedLine);
+        }
+
+        [HttpDelete("rejectTransaction")]
+        public async Task<IActionResult> rejectTransaction(IdDTO IdDTO)
+        {
+            bool isDeleted = await unitOfWork.AdminsRepository.rejectTransaction(IdDTO);
+            return Ok(isDeleted);
+        }
     }
 }
+ 
