@@ -12,6 +12,7 @@ namespace GloBus.Infrastructure.Interfaces
     public interface IUsersRepository
     {
         Task<User> AddUser(UserRegisterDTO request);
+        Task<TransactionRequest> sendTransactionRequest(TransactionRequestDTO request);
         Task<bool> DeleteUser(IdDTO IdDTO);
         Task<bool> ApproveUser(int id);
         Task<User> AddInspector(InspectorDTO inspector);
@@ -21,7 +22,7 @@ namespace GloBus.Infrastructure.Interfaces
         Task<ApiResponse<User>> loginUser(UserLoginDTO request);
         Task<User> GetUserById(String token);
         Task<List<Ticket>> getUserTicket(String token);
-        Task<User> AddCredit(String token, CreditDTO AddCreditValue);
+        Task<User> AddCredit(TransactionRequest transactionRequest);
 
         Task<bool> WritePenalty(PenaltyDTO penalty);
         Task<List<Penalty>> getMyWrittenPenalties(HttpContext httpContext);
@@ -29,5 +30,6 @@ namespace GloBus.Infrastructure.Interfaces
         Task<User> GetUserForPenalty(int id);
         Task<List<User>> getUnapprovedUsers();
         Task<List<User>> getAllInspectors();
+        Task<List<TransactionRequest>> getAllTransactions();
     }
 }
