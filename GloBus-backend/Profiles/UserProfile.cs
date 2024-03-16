@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+﻿ using AutoMapper;
 using GloBus.Data.DTOs;
 using GloBus.Data.Models;
 
@@ -37,6 +37,15 @@ namespace GloBus_backend.Profiles
 
             CreateMap<AdminDTO, Admin>();
             CreateMap<Admin, AdminDTO>();
+
+            CreateMap<LineDTO, Line>();
+            CreateMap<Line, LineDTO>();
+
+            CreateMap<EditLineDTO, Line>();
+            CreateMap<Line, EditLineDTO>();
+
+            CreateMap<TransactionRequestDTO, TransactionRequest>();
+            CreateMap<TransactionRequest, TransactionRequestDTO>();
         }
     }
 }
