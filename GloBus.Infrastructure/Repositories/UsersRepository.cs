@@ -106,6 +106,8 @@ namespace GloBus.Infrastructure.Repositories
 
         }
 
+       
+
         //delete user
         public async Task<bool> DeleteUser(IdDTO IdDTO)
         {
@@ -345,40 +347,16 @@ namespace GloBus.Infrastructure.Repositories
             return tickets;
         }
 
-        public async Task<User> AddCredit(string token, CreditDTO addCreditRequest)
+        public async Task<User> AddCredit(TransactionRequest transactionRequest)
         {
             try
             {
-                if (string.IsNullOrEmpty(token))
-                {
-                    throw new TokenNotFound("JWT is not found.");
-                }
 
-                // Dešifrujte JWT token
-                var handler = new JwtSecurityTokenHandler();
-                var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
-
-                if (jsonToken == null)
-                {
-                    throw new TokenNotFound("Failed decoding of the JWT token.");
-                }
-
-                // Dobijte ID korisnika iz Claim-a
-                var userId = jsonToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-
-                if (string.IsNullOrEmpty(userId))
-                {
-                    throw new TokenNotFound("ID was not found.");
-
-                }
-
-                // Pretvorite ID korisnika u integer (ili drugi tip koji koristite za ID)
-                if (!int.TryParse(userId, out int id))
-                {
-                    throw new TokenNotFound("Nevalidan format ID korisnika.");
-                }
+                TransactionRequest transactionReq = await context.TransactionRequests.FindAsync(transactionRequest.Id);
+                
+                
                 // Dobijanje ID-a korisnika iz tokena
-                var user = await context.Users.FirstOrDefaultAsync(u => u.Id == id);
+                var user = await context.Users.FirstOrDefaultAsync(u => u.Id == transactionRequest.UserId);
 
                 if (user == null)
                 {
@@ -388,7 +366,8 @@ namespace GloBus.Infrastructure.Repositories
                 }
                 else
                 {
-                    user.Credit += addCreditRequest.Credit;
+                    user.Credit += transactionRequest.Credit;
+                    context.TransactionRequests.Remove(transactionReq);
                     await context.SaveChangesAsync();
                     return user;
                 }
@@ -525,5 +504,41 @@ namespace GloBus.Infrastructure.Repositories
                 .ToListAsync();
             return inspectors;
         }
+
+        public async Task<List<TransactionRequest>> getAllTransactions()
+        {
+            List<TransactionRequest> transactionRequests = await context.TransactionRequests
+                .ToListAsync();
+            return transactionRequests;
+        }
+
+        public async Task<TransactionRequest> sendTransactionRequest(TransactionRequestDTO transactionRequestDTO)
+        {
+
+            TransactionRequest transactionRequest = mapper.Map<TransactionRequest>(transactionRequestDTO);
+
+
+            await context.TransactionRequests.AddAsync(transactionRequest);
+
+            await context.SaveChangesAsync();
+
+            transactionRequest = await context.TransactionRequests
+                    .Where(u => u.UserId == transactionRequestDTO.UserId)
+                    .FirstOrDefaultAsync();
+            if (transactionRequest == null)
+            {
+                throw new Exception("Request doesn't exists");
+
+            }
+            else
+            {
+                logger.LogInformation("Request sended.");
+                return transactionRequest;
+            }
+
+        }
+
+
+
     }
 }
