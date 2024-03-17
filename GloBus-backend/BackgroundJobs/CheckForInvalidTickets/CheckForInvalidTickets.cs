@@ -31,9 +31,7 @@ namespace GloBus_backend.BackgroundJobs.CheckForInvalidTickets
                     invalidTicket.Ticket.Status = "expired";
                     context.InvalidTickets.Add(new InvalidTickets
                     {
-                        Ticket = invalidTicket.Ticket
-                        
-                        //check if it exists already in table
+                        Ticket = invalidTicket.Ticket              
                     });
 
                     context.ActiveTickets.Remove(invalidTicket);

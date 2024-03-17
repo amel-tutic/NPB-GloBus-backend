@@ -2,11 +2,6 @@
 using GloBus.Data.Models;
 using GloBus.Data;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GloBus.Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using GloBus.Data.DTOs;
@@ -26,58 +21,92 @@ namespace GloBus.Infrastructure.Repositories
             this.logger = logger;
         }
 
+        //approve ticket
         public async Task<Ticket> ApproveTicket(TicketIdDTO ticketId)
         {
-            Ticket ticket = await context.Ticket.FindAsync(ticketId.Id);
-
-            if (ticket == null)
+            try
             {
-                throw new Exception("Ticket doesn't exist!");
+                Ticket ticket = await context.Ticket.FindAsync(ticketId.Id);
+
+                if (ticket == null)
+                {
+                    throw new Exception("Ticket doesn't exist!");
+                }
+
+                ticket.isApproved = true;
+                ticket.Status = "approved";
+                logger.LogInformation($"Approved ticket with id: {ticket.Id}");
+
+                ActiveTickets at = new ActiveTickets
+                {
+                    Ticket = ticket
+                };
+
+                var exists = await context.ActiveTickets
+                    .Where(at => at.Ticket == ticket)
+                    .FirstOrDefaultAsync();
+
+                if (exists != null)
+                {
+                    throw new Exception("Ticket is already active!");
+                }
+
+                context.ActiveTickets.Add(at);
+                await context.SaveChangesAsync();
+                logger.LogInformation($"Ticket with id {ticket.Id} added to active tickets.");
+                return ticket;
             }
-            ticket.isApproved = true;
-            ticket.Status = "approved";
-
-            ActiveTickets at = new ActiveTickets();
-            at.Ticket = ticket;
-
-            var exists = await context.ActiveTickets
-                .Where(at => at.Ticket == ticket)
-                .FirstOrDefaultAsync();
-
-            if (exists != null)
-                throw new Exception("Ticket is already active!");
-            context.ActiveTickets.Add(at);
-
-            await context.SaveChangesAsync();
-            return ticket;
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while approving ticket: {ex.Message}");
+                throw;
+            }
         }
 
+        //reject ticket
         public async Task<Ticket> RejectTicket(TicketIdDTO ticketId)
         {
-            Ticket ticket = await context.Ticket.FindAsync(ticketId.Id);
-
-            if (ticket == null)
+            try
             {
-                throw new Exception("Ticket doesn't exist!");
+                Ticket ticket = await context.Ticket.FindAsync(ticketId.Id);
+
+                if (ticket == null)
+                {
+                    throw new Exception("Ticket doesn't exist!");
+                }
+
+                ticket.Status = "rejected";
+                logger.LogInformation($"Rejected ticket with id: {ticket.Id}");
+
+
+                InvalidTickets it = new InvalidTickets
+                {
+                    Ticket = ticket
+                };
+
+                var exists = await context.InvalidTickets
+                    .Where(at => at.Ticket == ticket)
+                    .FirstOrDefaultAsync();
+
+                if (exists != null)
+                {
+                    throw new Exception("Ticket is already invalidated!");
+                }
+
+                context.InvalidTickets.Add(it);
+                await context.SaveChangesAsync();
+                logger.LogInformation($"Ticket with id {ticket.Id} added to invalid tickets.");
+                return ticket;
             }
-            ticket.Status = "rejected";
-
-            InvalidTickets it = new InvalidTickets();
-            it.Ticket = ticket;
-
-            var exists = await context.InvalidTickets
-                .Where(at => at.Ticket == ticket)
-                .FirstOrDefaultAsync();
-
-            if (exists != null)
-                throw new Exception("Ticket is already invalidated!");
-            context.InvalidTickets.Add(it);
-
-            await context.SaveChangesAsync();
-            return ticket;
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while rejecting ticket: {ex.Message}");
+                throw;
+            }
         }
 
-        public async Task<Ticket> checkTicketWithScanner(int ticketId)
+        //check ticket with scanner
+        public async Task<Ticket> CheckTicketWithScanner(int ticketId)
         {
             try
             {
@@ -99,29 +128,50 @@ namespace GloBus.Infrastructure.Repositories
             }
             catch (Exception ex)
             {
-                throw new Exception("Internal server error: " + ticketId);
+                throw new Exception("Internal server error, ticket id: " + ticketId);
             }
         }
 
+        //delete ticket
         public async Task<bool> DeleteTicket(int id)
         {
-            Ticket ticket = await context.Ticket.FindAsync(id);
-
-            if (ticket == null)
+            try
             {
+                Ticket ticket = await context.Ticket.FindAsync(id);
+
+                if (ticket == null)
+                {
+                    return false;
+                }
+
+                context.Ticket.Remove(ticket);
+                await context.SaveChangesAsync();
+                logger.LogInformation($"Ticket with id {id} successfully deleted!");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while deleting ticket: {ex.Message}");
                 return false;
             }
-            context.Ticket.Remove(ticket);
-            await context.SaveChangesAsync();
-            return true;
         }
 
-        public async Task<List<Ticket>> getUnapprovedTickets()
+        //get unapproved tickets
+        public async Task<List<Ticket>> GetUnapprovedTickets()
         {
-            List<Ticket> tickets = await context.Ticket
-                 .Where(t => t.isApproved == false && t.Status == "pending")
-                 .ToListAsync();
-            return tickets;
+            try
+            {
+                List<Ticket> tickets = await context.Ticket
+                    .Where(t => !t.isApproved && t.Status == "pending")
+                    .ToListAsync();
+
+                return tickets;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while fetching unapproved tickets: {ex.Message}");
+                throw new Exception("Error fetching unapproved tickets", ex);
+            }
         }
     }
 }

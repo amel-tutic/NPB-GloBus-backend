@@ -2,9 +2,7 @@
 using GloBus.Data.Models;
 using GloBus.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
 
 namespace GloBus_backend.Controllers
 {
@@ -14,79 +12,75 @@ namespace GloBus_backend.Controllers
     {
         private readonly IUnitOfWork unitOfWork;
 
-
         public AdminsController(IUnitOfWork UnitOfWork)
         {
             unitOfWork = UnitOfWork;
         }
 
-
+        //login admin
         [HttpPost("login")]
-        public async Task<IActionResult> login(AdminDTO request)
+        public async Task<IActionResult> Login(AdminDTO request)
         {
-
-            var user = await unitOfWork.AdminsRepository.loginAdmin(request);
+            var user = await unitOfWork.AdminsRepository.LoginAdmin(request);
 
             return Ok(user);
-
         }
 
-        [HttpGet("getAllLines")]
-
-        public async Task<IActionResult> getAllLines()
+        //get all lines for admin
+        [HttpGet("getAllLines"), Authorize]
+        public async Task<IActionResult> GetAllLines()
         {
-            try
-            {
-                List<Line> lines = await unitOfWork.AdminsRepository.getAllLines();
+                List<Line> lines = await unitOfWork.AdminsRepository.GetAllLines();
                 return Ok(lines);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-
         }
 
-
-        [HttpPut("PromoteToInspector")]
+        //promote user to inspector
+        [HttpPut("PromoteToInspector"), Authorize(Roles = "admin")]
         public async Task<IActionResult> PromoteToInspector(IdDTO userId)
         {
             User promotedUser = await unitOfWork.AdminsRepository.PromoteToInspector(userId);
             return Ok(promotedUser);
         }
 
-        [HttpPut("DemoteFromInspector")]
+        //demote user from inspector
+        [HttpPut("DemoteFromInspector"), Authorize(Roles = "admin")]
         public async Task<IActionResult> DemoteFromInspector(IdDTO userId)
         {
             User promotedUser = await unitOfWork.AdminsRepository.DemoteFromInspector(userId);
             return Ok(promotedUser);
         }
 
-        [HttpDelete("deleteLine")]
-        public async Task<IActionResult> deleteLine(IdDTO IdDTO)
+        //delete line
+        [HttpDelete("deleteLine"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> DeleteLine(IdDTO idDTO)
         {
-            bool isDeleted = await unitOfWork.AdminsRepository.deleteLine(IdDTO);
-            return Ok(isDeleted);
+            bool isDeleted = await unitOfWork.AdminsRepository.DeleteLine(idDTO);
+            if(isDeleted)
+                return Ok(isDeleted);
+            throw new Exception("Line doesn't exist.");
         }
 
-        [HttpPost("addLine")]
-        public async Task<IActionResult> addLine(LineDTO lineDTO)
+        //add line
+        [HttpPost("addLine"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> AddLine(LineDTO lineDTO)
         {
-            Line line = await unitOfWork.AdminsRepository.addLine(lineDTO);
+            Line line = await unitOfWork.AdminsRepository.AddLine(lineDTO);
             return Ok(line);
         }
 
-        [HttpPut("editLine")]
-        public async Task<IActionResult> editLine(EditLineDTO editLineDTO)
+        //edit line
+        [HttpPut("editLine"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> EditLine(EditLineDTO editLineDTO)
         {
-            Line editedLine = await unitOfWork.AdminsRepository.editLine(editLineDTO);
+            Line editedLine = await unitOfWork.AdminsRepository.EditLine(editLineDTO);
             return Ok(editedLine);
         }
 
-        [HttpDelete("rejectTransaction")]
-        public async Task<IActionResult> rejectTransaction(IdDTO IdDTO)
+        //reject(delete) transaction
+        [HttpDelete("rejectTransaction"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> RejectTransaction(IdDTO idDTO)
         {
-            bool isDeleted = await unitOfWork.AdminsRepository.rejectTransaction(IdDTO);
+            bool isDeleted = await unitOfWork.AdminsRepository.RejectTransaction(idDTO);
             return Ok(isDeleted);
         }
     }

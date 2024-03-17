@@ -1,35 +1,29 @@
 ﻿using GloBus.Data.DTOs;
 using GloBus.Data.Models;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GloBus.Infrastructure.Interfaces
 {
     public interface IUsersRepository
     {
         Task<User> AddUser(UserRegisterDTO request);
-        Task<TransactionRequest> sendTransactionRequest(TransactionRequestDTO request);
-        Task<bool> DeleteUser(IdDTO IdDTO);
+        Task<TransactionRequest> SendTransactionRequest(TransactionRequestDTO request);
+        Task<bool> DeleteUser(IdDTO idDTO);
         Task<bool> ApproveUser(int id);
         Task<User> AddInspector(InspectorDTO inspector);
         Task<Ticket> AddTicket(TicketDTO request);
-        Task<List<User>> getAllUsers();
-        Task<List<TicketType>> getTicketTypes();
-        Task<ApiResponse<User>> loginUser(UserLoginDTO request);
-        Task<User> GetUserById(String token);
-        Task<List<Ticket>> getUserTicket(String token);
+        Task<List<User>> GetAllUsers();
+        Task<ApiResponse<User>> LoginUser(UserLoginDTO request);
+        Task<User> GetUserById(string token);
+        Task<List<Ticket>> GetUserTickets(String token);
         Task<User> AddCredit(TransactionRequest transactionRequest);
 
         Task<bool> WritePenalty(PenaltyDTO penalty);
-        Task<List<Penalty>> getMyWrittenPenalties(HttpContext httpContext);
+        Task<List<Penalty>> GetMyWrittenPenalties(HttpContext httpContext);
         Task<Ticket> CheckTicket(TicketIdDTO ticketId);
         Task<User> GetUserForPenalty(int id);
-        Task<List<User>> getUnapprovedUsers();
-        Task<List<User>> getAllInspectors();
-        Task<List<TransactionRequest>> getAllTransactions();
+        Task<List<User>> GetUnapprovedUsers();
+        Task<List<User>> GetAllInspectors();
+        Task<List<TransactionRequest>> GetAllTransactions();
     }
 }

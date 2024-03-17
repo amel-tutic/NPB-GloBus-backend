@@ -1,5 +1,4 @@
 ﻿using GloBus.Infrastructure;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GloBus_backend.Controllers

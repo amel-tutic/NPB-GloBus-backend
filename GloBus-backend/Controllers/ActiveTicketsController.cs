@@ -1,7 +1,7 @@
 ﻿using GloBus.Data.DTOs;
 using GloBus.Data.Models;
 using GloBus.Infrastructure;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GloBus_backend.Controllers
@@ -17,18 +17,20 @@ namespace GloBus_backend.Controllers
             unitOfWork = UnitOfWork;
         }
 
-        [HttpGet("getAll")]
-        public async Task<IActionResult> getAll()
+        //get all active tickets
+        [HttpGet("getAll"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetAll()
         {
-            List<ActiveTickets> activeTickets = await unitOfWork.ActiveTicketsRepository.GetAll();
-            return Ok(activeTickets);
+                List<ActiveTickets> activeTickets = await unitOfWork.ActiveTicketsRepository.GetAll();
+                return Ok(activeTickets);
         }
 
-        [HttpPost("add")]
-        public async Task<IActionResult> add(TicketIdDTO ticketId)
+        //add an active ticket
+        [HttpPost("add"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> Add(TicketIdDTO ticketId)
         {
-            ActiveTickets activeTicket = await unitOfWork.ActiveTicketsRepository.Add(ticketId);
-            return Ok(activeTicket);
+                ActiveTickets activeTicket = await unitOfWork.ActiveTicketsRepository.Add(ticketId);
+                return Ok(activeTicket);
         }
     }
 }

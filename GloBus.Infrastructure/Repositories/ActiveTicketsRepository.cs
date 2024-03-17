@@ -2,11 +2,6 @@
 using GloBus.Data.Models;
 using GloBus.Data;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using GloBus.Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using GloBus.Data.DTOs;
@@ -26,35 +21,64 @@ namespace GloBus.Infrastructure.Repositories
             this.logger = logger;
         }
 
-        public async Task<ActiveTickets> Add(TicketIdDTO ticketId)
-        {
-            Ticket t = mapper.Map<Ticket>(ticketId);
-
-            t = await context.Ticket.FindAsync(t.Id);
-
-            if(t == null)
-            {
-                throw new Exception("Ticket doesn't exist!");
-            }
-
-            ActiveTickets activeTicket = new ActiveTickets();
-            activeTicket.Ticket = t;
-
-            await context.ActiveTickets.AddAsync(activeTicket);
-
-            await context.SaveChangesAsync();
-
-            return activeTicket;
-        }
-
+        //get all active tickets
         public async Task<List<ActiveTickets>> GetAll()
         {
-            List<ActiveTickets> activeTickets = await context.ActiveTickets
-                                                             .Include(at => at.Ticket)
-                                                             .ToListAsync();
+            try
+            {
+                List<ActiveTickets> activeTickets = await context.ActiveTickets
+                                                                 .Include(at => at.Ticket)
+                                                                 .ToListAsync();
+                return activeTickets;
+            }
 
-            return activeTickets;
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while fetching active tickets: {ex.Message}");
+                throw;
+            }
         }
 
+        //add an active ticket
+        public async Task<ActiveTickets> Add(TicketIdDTO ticketId)
+        {
+            try
+            {
+                Ticket t = mapper.Map<Ticket>(ticketId);
+                t = await context.Ticket.FindAsync(t.Id);
+
+                if (t == null)
+                {
+                    string errorMessage = "Ticket doesn't exist!";
+                    logger.LogError(errorMessage);
+                    throw new ArgumentException(errorMessage);
+                }
+
+                ActiveTickets activeTicket = new ActiveTickets
+                {
+                    Ticket = t
+                };
+
+                await context.ActiveTickets.AddAsync(activeTicket);
+                await context.SaveChangesAsync();
+
+                return activeTicket;
+            }
+            catch (DbUpdateException ex)
+            {
+                logger.LogError($"An error occurred while adding active ticket to the database: {ex.Message}");
+                throw;
+            }
+            catch (ArgumentException ex)
+            {
+                logger.LogError($"An error occurred: {ex.Message}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"An unexpected error occurred: {ex.Message}");
+                throw;
+            }
+        }
     }
 }

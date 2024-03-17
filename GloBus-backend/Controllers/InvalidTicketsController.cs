@@ -1,6 +1,6 @@
 ﻿using GloBus.Data.Models;
 using GloBus.Infrastructure;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GloBus_backend.Controllers
@@ -16,8 +16,9 @@ namespace GloBus_backend.Controllers
             unitOfWork = UnitOfWork;
         }
 
-        [HttpGet("getAll")]
-        public async Task<IActionResult> getAll()
+        //get all invalid tickets
+        [HttpGet("getAll"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetAll()
         {
             List<InvalidTickets> invalidTickets = await unitOfWork.InvalidTicketsRepository.GetAll();
             return Ok(invalidTickets);

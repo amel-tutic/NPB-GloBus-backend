@@ -3,11 +3,6 @@ using GloBus.Data.Models;
 using GloBus.Data;
 using GloBus.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace GloBus.Infrastructure.Repositories
@@ -25,13 +20,22 @@ namespace GloBus.Infrastructure.Repositories
             this.logger = logger;
         }
 
+        //get all invalid tickets
         public async Task<List<InvalidTickets>> GetAll()
         {
-            List<InvalidTickets> invalidTickets = await context.InvalidTickets
-                .Include(it => it.Ticket)
-                .ToListAsync();
+            try
+            {
+                List<InvalidTickets> invalidTickets = await context.InvalidTickets
+                    .Include(it => it.Ticket)
+                    .ToListAsync();
 
-            return invalidTickets;
+                return invalidTickets;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while fetching invalid tickets: {ex.Message}");
+                throw new Exception("Error fetching invalid tickets", ex);
+            }
         }
 
     }

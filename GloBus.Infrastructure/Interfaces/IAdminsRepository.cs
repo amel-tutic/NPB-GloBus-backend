@@ -1,28 +1,23 @@
 ﻿using GloBus.Data.DTOs;
 using GloBus.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GloBus.Infrastructure.Interfaces
 {
     public interface IAdminsRepository
     {
-        Task<ApiResponse<Admin>> loginAdmin(AdminDTO request);
-        Task<List<Line>> getAllLines();
+        Task<ApiResponse<Admin>> LoginAdmin(AdminDTO request);
+        Task<List<Line>> GetAllLines();
 
         Task<User> PromoteToInspector(IdDTO id);
 
         Task<User> DemoteFromInspector(IdDTO id);
 
-        Task<bool> deleteLine(IdDTO id);
-        Task<Line> addLine(LineDTO lineDTO);
+        Task<bool> DeleteLine(IdDTO id);
+        Task<Line> AddLine(LineDTO lineDTO);
 
-        Task<Line> editLine(EditLineDTO editLineDTO);
+        Task<Line> EditLine(EditLineDTO editLineDTO);
 
-        Task<bool> rejectTransaction(IdDTO IdDTO);
+        Task<bool> RejectTransaction(IdDTO idDTO);
 
     }
 }

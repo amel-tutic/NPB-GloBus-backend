@@ -7,13 +7,10 @@ using GloBus.Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
+using System.IO;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace GloBus.Infrastructure.Repositories
 {
@@ -29,131 +26,8 @@ namespace GloBus.Infrastructure.Repositories
             this.logger = logger;
             this.context = context;
         }
-        public async Task<ApiResponse<Admin>> loginAdmin(AdminDTO adminDTO)
-        {
 
-            Admin admin = mapper.Map<Admin>(adminDTO);
-
-            admin = await context.Admins.FirstOrDefaultAsync(u => u.Email == admin.Email);
-
-            if (admin != null)
-            {
-                bool passwordMatch = BCrypt.Net.BCrypt.Verify(adminDTO.Password, admin.Password);
-
-                if (passwordMatch)
-                {
-                    var token = GenerateJwtToken(admin);
-
-                    var response = new ApiResponse<Admin>
-                    {
-                        Status = true,
-                        Message = "Log in successfull",
-                        Data = admin,
-                        Token = token
-                    };
-
-                    return response;
-                }
-                else
-                {
-                    throw new LoginFailedException("Invalid credentials");
-                }
-
-            }
-            else
-            {
-                throw new LoginFailedException("Invalid credentials");
-              }
-        }
-
-        public async Task<List<Line>> getAllLines()
-        {
-            List<Line> lines = await context.Line.ToListAsync();
-            return lines;
-        }
-
-        public async Task<User> PromoteToInspector(IdDTO id)
-        {
-            User user = await context.Users.FindAsync(id.Id);
-
-            if (user == null)
-            {
-                throw new Exception("User doesn't exist!");
-            }
-
-            user.Role = "inspector";
-
-           
-
-            await context.SaveChangesAsync();
-            return user;
-        }
-
-        public async Task<User> DemoteFromInspector(IdDTO id)
-        {
-            User user = await context.Users.FindAsync(id.Id);
-
-            if (user == null)
-            {
-                throw new Exception("User doesn't exist!");
-            }
-
-            user.Role = "passenger";
-
-
-
-            await context.SaveChangesAsync();
-            return user;
-        }
-
-       
-         public async Task<bool> deleteLine(IdDTO IdDTO)
-        {
-            Line line = await context.Line.FindAsync(IdDTO.Id);
-            if (line == null)
-            {
-                return false;
-            }
-            context.Line.Remove(line);
-            await context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<Line> addLine(LineDTO lineDTO)
-        {
-            Line line = mapper.Map<Line>(lineDTO);
-
-            bool lineExists = await context.Line.AnyAsync(u => u.Name == line.Name);
-
-            if (lineExists)
-            {
-                throw new UserExistsException("Station already exists");
-
-            }
-            else
-            {
-                await context.Line.AddAsync(line);
-
-                await context.SaveChangesAsync();
-
-                line = await context.Line
-                    .Where(u => u.Name == lineDTO.Name)
-                    .FirstOrDefaultAsync();
-                if (line == null)
-                {
-                    throw new Exception("Line doesn't exists");
-
-                }
-                else
-                {
-                    logger.LogInformation("Line added.");
-                    return line;
-                }
-            }
-            }
-
-
-        //token
+        //generate jwt
         public string GenerateJwtToken(Admin admin)
         {
             var claims = new List<Claim>
@@ -181,35 +55,225 @@ namespace GloBus.Infrastructure.Repositories
             return tokenString;
         }
 
-        public async Task<Line> editLine(EditLineDTO editLine)
+        //login admin
+        public async Task<ApiResponse<Admin>> LoginAdmin(AdminDTO adminDTO)
         {
-            Line line = await context.Line.FindAsync(editLine.Id);
-
-            if (line == null)
+            try
             {
-                throw new Exception("Line doesn't exist!");
+                Admin admin = mapper.Map<Admin>(adminDTO);
+
+                admin = await context.Admins.FirstOrDefaultAsync(u => u.Email == admin.Email);
+
+                if (admin != null)
+                {
+                    bool passwordMatch = BCrypt.Net.BCrypt.Verify(adminDTO.Password, admin.Password);
+
+                    if (passwordMatch)
+                    {
+                        var token = GenerateJwtToken(admin);
+
+                        var response = new ApiResponse<Admin>
+                        {
+                            Status = true,
+                            Message = "Login successful",
+                            Data = admin,
+                            Token = token
+                        };
+
+                        logger.LogInformation("Admin logged in successfully!");
+                        return response;
+                    }
+                    else
+                    {
+                        throw new LoginFailedException("Invalid credentials");
+                    }
+                }
+                else
+                {
+                    throw new LoginFailedException("Invalid credentials");
+                }
             }
-            line.Distance = editLine.Distance;
-            line.Name = editLine.Name;
-            line.Stations = editLine.Stations;
-
-
-            await context.SaveChangesAsync();
-            return line;
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while logging in: {ex.Message}");
+                throw;
+            }
         }
 
-        public async Task<bool> rejectTransaction(IdDTO IdDTO)
+        //get all lines for admin
+        public async Task<List<Line>> GetAllLines()
         {
-            TransactionRequest transactionRequest = await context.TransactionRequests.FindAsync(IdDTO.Id);
-            if (transactionRequest == null)
+            try
             {
-                return false;
+                List<Line> lines = await context.Line.ToListAsync();
+                return lines;
             }
-            context.TransactionRequests.Remove(transactionRequest);
-            await context.SaveChangesAsync();
-            return true;
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while fetching all lines: {ex.Message}");
+                throw;
+            }
         }
 
+        //promote to inspector
+        public async Task<User> PromoteToInspector(IdDTO id)
+        {
+            try
+            {
+                User user = await context.Users.FindAsync(id.Id);
 
+                if (user == null)
+                {
+                    throw new Exception("User doesn't exist!");
+                }
+
+                user.Role = "inspector";
+
+                await context.SaveChangesAsync();
+                logger.LogInformation("User successfully promoted to Inspector!");
+                return user;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while promoting user to inspector: {ex.Message}");
+                throw;
+            }
+        }
+
+        //demote from inspector
+        public async Task<User> DemoteFromInspector(IdDTO id)
+        {
+            try
+            {
+                User user = await context.Users.FindAsync(id.Id);
+
+                if (user == null)
+                {
+                    throw new Exception("User doesn't exist!");
+                }
+
+                user.Role = "passenger";
+
+                await context.SaveChangesAsync();
+                logger.LogInformation("User successfully demoted from Inspector!");
+                return user;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while demoting user from inspector: {ex.Message}");
+                throw;
+            }
+        }
+
+        //delete line
+         public async Task<bool> DeleteLine(IdDTO idDTO)
+        {
+            try
+            {
+                Line line = await context.Line.FindAsync(idDTO.Id);
+
+                if (line == null)
+                {
+                    return false;
+                }
+
+                context.Line.Remove(line);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Line successfully deleted!");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while deleting line: {ex.Message}");
+                throw;
+            }
+        }
+
+        //add line
+        public async Task<Line> AddLine(LineDTO lineDTO)
+        {
+            try
+            {
+                Line line = mapper.Map<Line>(lineDTO);
+
+                bool lineExists = await context.Line.AnyAsync(u => u.Name == line.Name);
+
+                if (lineExists)
+                {
+                    throw new UserExistsException("Line already exists");
+                }
+
+                await context.Line.AddAsync(line);
+                await context.SaveChangesAsync();
+
+                line = await context.Line
+                    .Where(u => u.Name == lineDTO.Name)
+                    .FirstOrDefaultAsync();
+
+                if (line == null)
+                {
+                    throw new Exception("Line doesn't exist after adding");
+                }
+
+                logger.LogInformation("Line added successfully.");
+                return line;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while adding line: {ex.Message}");
+                throw;
+            }
+        }
+
+        //edit line
+        public async Task<Line> EditLine(EditLineDTO editLine)
+        {
+            try
+            {
+                Line line = await context.Line.FindAsync(editLine.Id);
+
+                if (line == null)
+                {
+                    throw new Exception("Line not found");
+                }
+
+                line.Distance = editLine.Distance;
+                line.Name = editLine.Name;
+                line.Stations = editLine.Stations;
+
+                await context.SaveChangesAsync();
+                logger.LogInformation("Line successfully edited!");
+                return line;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while editing line: {ex.Message}");
+                throw;
+            }
+        }
+
+        //reject transaction
+        public async Task<bool> RejectTransaction(IdDTO idDTO)
+        {
+            try
+            {
+                TransactionRequest transactionRequest = await context.TransactionRequests.FindAsync(idDTO.Id);
+
+                if (transactionRequest == null)
+                {
+                    return false;
+                }
+
+                context.TransactionRequests.Remove(transactionRequest);
+                await context.SaveChangesAsync();
+                logger.LogInformation("Transaction successfully rejected(deleted)!");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while rejecting transaction: {ex.Message}");
+                throw;
+            }
+        }
     }
 }

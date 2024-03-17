@@ -1,5 +1,6 @@
-﻿using GloBus.Infrastructure;
-using Microsoft.AspNetCore.Http;
+﻿using GloBus.Data.Models;
+using GloBus.Infrastructure;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GloBus_backend.Controllers
@@ -13,6 +14,14 @@ namespace GloBus_backend.Controllers
         public TicketTypesController(IUnitOfWork UnitOfWork)
         {
             unitOfWork = UnitOfWork;
+        }
+
+        //get ticket types
+        [HttpGet("getTicketTypes"), Authorize]
+        public async Task<IActionResult> getTicketTypes()
+        {
+            List<TicketType> ticketTypes = await unitOfWork.TicketTypesRepository.GetTicketTypes();
+            return Ok(ticketTypes);
         }
     }
 }

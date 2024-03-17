@@ -3,11 +3,7 @@ using GloBus.Data.Models;
 using GloBus.Data;
 using GloBus.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace GloBus.Infrastructure.Repositories
 {
@@ -22,6 +18,21 @@ namespace GloBus.Infrastructure.Repositories
             this.context = context;
             this.mapper = mapper;
             this.logger = logger;
+        }
+
+        //get ticket types
+        public async Task<List<TicketType>> GetTicketTypes()
+        {
+            try
+            {
+                List<TicketType> types = await context.TicketType.ToListAsync();
+                return types;
+            }
+            catch (Exception ex)
+            {
+                logger.LogError($"An error occurred while fetching ticket types: {ex.Message}");
+                throw new Exception("Error fetching ticket types", ex);
+            }
         }
     }
 }

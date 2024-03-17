@@ -1,11 +1,6 @@
 ﻿using GloBus.Infrastructure.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using GloBus.Infrastructure.Repositories;
@@ -46,11 +41,9 @@ namespace GloBus.Infrastructure.CustomMiddlewares
             {
                 Success = false
             };
+
             switch (exception)
             {
-               
-
-                
                 case LoginFailedException ex:
                     response.StatusCode = (int)HttpStatusCode.BadRequest;
                     errorResponse.Message = ex.Message;

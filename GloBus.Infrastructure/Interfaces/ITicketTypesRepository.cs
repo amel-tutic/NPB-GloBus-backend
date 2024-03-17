@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
+using GloBus.Data.Models;
 
 namespace GloBus.Infrastructure.Interfaces
 {
     public interface ITicketTypesRepository
     {
+        Task<List<TicketType>> GetTicketTypes();
     }
 }

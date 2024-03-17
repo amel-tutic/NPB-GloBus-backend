@@ -2,10 +2,8 @@
 using GloBus.Data.Models;
 using GloBus.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 
 namespace GloBus_backend.Controllers
 {
@@ -23,83 +21,59 @@ namespace GloBus_backend.Controllers
            
         }
 
+        //add (register) user
         [HttpPost("add")]
         public async Task<IActionResult> Add(UserRegisterDTO request)
         {
-            /*Console.WriteLine(request.FirstName);*/
-            
-
             User user = await unitOfWork.UsersRepository.AddUser(request);
-
             return Ok(user);
         }
 
-        [HttpDelete("delete")]
-        public async Task<IActionResult> Delete(IdDTO IdDTO)
+        //delete user
+        [HttpDelete("delete"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> Delete(IdDTO idDTO)
         {
-            bool isDeleted = await unitOfWork.UsersRepository.DeleteUser(IdDTO);
-            return Ok(isDeleted);
+            bool isDeleted = await unitOfWork.UsersRepository.DeleteUser(idDTO);
+            if(isDeleted)
+                return Ok(isDeleted);
+            throw new Exception("User doesn't exist");
         }
 
-        [HttpPut("approveUser")]
-        public async Task<IActionResult> approveUser(int id)
+        //approve user
+        [HttpPut("approveUser"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> ApproveUser(int id)
         {
             bool isApproved = await unitOfWork.UsersRepository.ApproveUser(id);
-            return Ok(isApproved);
+            if(isApproved)
+                return Ok(isApproved);
+            throw new Exception("User doesn't exist");
         }
-        
 
-        [HttpPost("addInspector")]
-        public async Task<IActionResult> addInspector(InspectorDTO inspector)
+        //add inspector
+        [HttpPost("addInspector"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> AddInspector(InspectorDTO inspector)
         {
             User user = await unitOfWork.UsersRepository.AddInspector(inspector);
             return Ok(user);
         }
 
-        [HttpGet("getAll"),Authorize]
-
-        public async Task<IActionResult> getAll()
+        //get all users
+        [HttpGet("getAll"), Authorize(Roles = "admin")]
+        public async Task<IActionResult> GetAll()
         {
-            try
-            {
-                List<User> users = await unitOfWork.UsersRepository.getAllUsers();
-                return Ok(users); 
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500,  ex.Message);
-            }
-           
+                List<User> users = await unitOfWork.UsersRepository.GetAllUsers();
+                return Ok(users);   
         }
 
-       
-
-        [HttpGet("getTicketTypes"), Authorize]
-
-        public async Task<IActionResult> getTicketTypes()
-        {
-            try
-            {
-                List<TicketType> ticketTypes = await unitOfWork.UsersRepository.getTicketTypes();
-                return Ok(ticketTypes);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, ex.Message);
-            }
-
-        }
-
+        //login user
         [HttpPost("login")]
         public async Task<IActionResult> login(UserLoginDTO request)
         {
-           
-                var user = await unitOfWork.UsersRepository.loginUser(request);
-
-                return Ok(user);
-            
+                var user = await unitOfWork.UsersRepository.LoginUser(request);
+                return Ok(user); 
         }
 
+        //get user by id
         [HttpGet("getUserById"), Authorize]
         public async Task<IActionResult> GetUserById()
         {
@@ -109,96 +83,90 @@ namespace GloBus_backend.Controllers
             return Ok(user);
         }
 
+        //add ticket
         [HttpPost("addTicket"), Authorize]
         public async Task<IActionResult> Add(TicketDTO request)
         {
-            /*Console.WriteLine(request.FirstName);*/
-
-
             Ticket ticket = await unitOfWork.UsersRepository.AddTicket(request);
-
             return Ok("Ticket purchased successfully");
         }
 
+        //get user tickets
         [HttpGet("getUserTickets"), Authorize]
-        public async Task<IActionResult> getUserTickets()
+        public async Task<IActionResult> GetUserTickets()
         {
             var token = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 
-            List<Ticket> tickets = await unitOfWork.UsersRepository.getUserTicket(token);
+            List<Ticket> tickets = await unitOfWork.UsersRepository.GetUserTickets(token);
             return Ok(tickets);
         }
 
+        //add credit
         [HttpPost("addCredit"), Authorize]
         public async Task<IActionResult> Add(TransactionRequest transactionRequest)
         {
-            
-            
-            /*Console.WriteLine(request.FirstName);*/
-           
-
             User user = await unitOfWork.UsersRepository.AddCredit(transactionRequest);
-
             return Ok(user);
         }
 
-        [HttpPost("sendTransactionRequest")]
-        public async Task<IActionResult> sendTransactionRequest(TransactionRequestDTO request)
+        //send transaction request
+        [HttpPost("sendTransactionRequest"), Authorize(Roles = "passenger")]
+        public async Task<IActionResult> SendTransactionRequest(TransactionRequestDTO request)
         {
-            /*Console.WriteLine(request.FirstName);*/
-
-
-            TransactionRequest transactionRequest = await unitOfWork.UsersRepository.sendTransactionRequest(request);
-
+            TransactionRequest transactionRequest = await unitOfWork.UsersRepository.SendTransactionRequest(request);
             return Ok(transactionRequest);
         }
 
+        //check ticket
         [HttpPost("CheckTicket"), Authorize(Roles = "inspector")]
         public async Task<IActionResult> CheckTicket(TicketIdDTO ticketId)
-        
-            {
+        {
                 Ticket t = await unitOfWork.UsersRepository.CheckTicket(ticketId);
                 User u = await unitOfWork.UsersRepository.GetUserForPenalty(t.UserId);
                 var result = new { ticket = t, user = u };
                 return Ok(result);
+        }
 
-            }
-        [HttpPost("WritePenalty"), Authorize]
-
+        //write penalty
+        [HttpPost("WritePenalty"), Authorize(Roles = "inspector")]
         public async Task<IActionResult> WritePenalty(PenaltyDTO penalty)
         {
-            bool isWrited = await unitOfWork.UsersRepository.WritePenalty(penalty);
-            return Ok(isWrited);
-
+            bool isWritten = await unitOfWork.UsersRepository.WritePenalty(penalty);
+            if(isWritten)
+                return Ok(isWritten);
+            throw new Exception("Error while writing penalty.");
         }
 
-        [HttpGet("getMyWrittenPenalties"), Authorize]
-        public async Task<IActionResult> getMyWrittenPenalties()
+        //get written penalties
+        [HttpGet("getMyWrittenPenalties"), Authorize(Roles = "inspector")]
+        public async Task<IActionResult> GetMyWrittenPenalties()
         {
-            List<Penalty> penalties = await unitOfWork.UsersRepository.getMyWrittenPenalties(HttpContext);
+            List<Penalty> penalties = await unitOfWork.UsersRepository.GetMyWrittenPenalties(HttpContext);
 
             return Ok(penalties);
-
         }
 
-        [HttpGet("getUnapprovedUsers")]
+        //get unapproved users
+        [HttpGet("getUnapprovedUsers"), Authorize(Roles = "admin")]
         public async Task<IActionResult> GetUnapprovedUsers()
         {
-            List<User> unapprovedUsers = await unitOfWork.UsersRepository.getUnapprovedUsers();
+            List<User> unapprovedUsers = await unitOfWork.UsersRepository.GetUnapprovedUsers();
             return Ok(unapprovedUsers);
         }
 
-        [HttpGet("getAllInspectors")]
+        //get all inspectors
+        [HttpGet("getAllInspectors"), Authorize(Roles = "admin")]
         public async Task<IActionResult> GetAllInspectors()
         {
-            List<User> inspectors = await unitOfWork.UsersRepository.getAllInspectors();
+            List<User> inspectors = await unitOfWork.UsersRepository.GetAllInspectors();
             return Ok(inspectors);
         }
 
-        [HttpGet("getAllTransactions")]
+        //get all transactions
+        [HttpGet("getAllTransactions"), Authorize(Roles = "admin")]
         public async Task<IActionResult> getAllTransactions()
         {
-            List<TransactionRequest> inspectors = await unitOfWork.UsersRepository.getAllTransactions();
+            List<TransactionRequest> inspectors = await unitOfWork.UsersRepository.GetAllTransactions();
             return Ok(inspectors);
         }
     }

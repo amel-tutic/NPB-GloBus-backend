@@ -3,11 +3,6 @@ using GloBus.Data.Models;
 using GloBus.Data;
 using GloBus.Infrastructure.Interfaces;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GloBus.Infrastructure.Repositories
 {
